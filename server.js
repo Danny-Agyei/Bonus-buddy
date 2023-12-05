@@ -402,7 +402,7 @@ $(document).ready(function() {
 
 	const userEmail = getQueryParameter('user');
 
-	const redirectLink = 'http://localhost:3000/success';
+	const redirectLink = 'https://giant-pink-raincoat.cyclic.app/success';
 	
 
 	if (userEmail) {
@@ -416,7 +416,7 @@ $(document).ready(function() {
 
 			if (email.length > 0 && email.includes("@")) {
 				$.ajax({
-					url: 'http://localhost:3000/refer',
+					url: 'https://giant-pink-raincoat.cyclic.app/refer',
 					data: {
 						"username": userEmail,
 						"referees": referees
