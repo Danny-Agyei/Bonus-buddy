@@ -60,120 +60,120 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //RECEIVE MAILCHIMP WEBHOOK POST REQUEST
 //HANDLE DATA SEND BY MAILCHIPM DUE TO CHANGES OR UPDATES IN YOUR LIST
 
-app.post("/", async (req, res, next) => {
-  const { type, data } = req.body;
+// app.post("/", async (req, res, next) => {
+//   const { type, data } = req.body;
 
-  if (type !== "subscribe") {
-    return res.end();
-  }
+//   if (type !== "subscribe") {
+//     return res.end();
+//   }
 
-  console.log("IM MAILCHIMP WEBHOOK REQUEST ==>");
-  //CHECK TO SEE IF COMPLETELY NEW SUBSCRIBER
-  if (data.merges.REFCODE.length < 1 && data.merges.REFERECODE.length < 1) {
-    try {
-      console.log("IM NEW SUBSCRIBER ==>");
-      const generatedCode = voucher_codes.generate({
-        length: 8,
-        count: 1,
-      });
+//   console.log("IM MAILCHIMP WEBHOOK REQUEST ==>");
+//   //CHECK TO SEE IF COMPLETELY NEW SUBSCRIBER
+//   if (data.merges.REFCODE.length < 1 && data.merges.REFERECODE.length < 1) {
+//     try {
+//       console.log("IM NEW SUBSCRIBER ==>");
+//       const generatedCode = voucher_codes.generate({
+//         length: 8,
+//         count: 1,
+//       });
 
-      let referralCode = generatedCode[0] + seconds;
+//       let referralCode = generatedCode[0] + seconds;
 
-      const token = jwt.sign(
-        {
-          user: data.email,
-        },
-        "secretKey"
-      );
+//       const token = jwt.sign(
+//         {
+//           user: data.email,
+//         },
+//         "secretKey"
+//       );
 
-      const newUser = new User({
-        email: data.email,
-        referralCode: referralCode,
-        shareUrl: process.env.SHARE_URL + "=" + referralCode,
-        referralSource: token,
-        totalReferrals: 0,
-        status: "subscribed",
-      });
+//       const newUser = new User({
+//         email: data.email,
+//         referralCode: referralCode,
+//         shareUrl: process.env.SHARE_URL + "=" + referralCode,
+//         referralSource: token,
+//         totalReferrals: 0,
+//         status: "subscribed",
+//       });
 
-      console.log("Im in try code!");
-      console.log("USER INFO ==>", newUser);
+//       console.log("Im in try code!");
+//       console.log("USER INFO ==>", newUser);
 
-      const savedUser = await newUser.save();
-      const subscriber_hash = md5(savedUser.email.toLowerCase());
+//       const savedUser = await newUser.save();
+//       const subscriber_hash = md5(savedUser.email.toLowerCase());
 
-      const response = await mailchimp.lists.updateListMember(
-        listId,
-        subscriber_hash,
-        {
-          merge_fields: {
-            REFCOUNT: 0,
-            SHAREURL: savedUser.shareUrl,
-            REFCODE: savedUser.referralCode,
-            REFSOURCE: savedUser.referralSource,
-          },
-        }
-      );
-      console.log("Successfully saved new user to DB!");
-      return console.log("Successfully updated user field in Mailchimp!");
-    } catch (error) {
-      console.log("error in try catch", error);
-      return console.log(error.message);
-    }
-  } else if (
-    data.merges.REFERECODE.length > 1 &&
-    data.merges.REFCODE.length > 1
-  ) {
-    //WAS REFERED BY SOMEONE
-    console.log("I'M REFFERED BY FRIEND ==>");
-    const user = new User({
-      userId: data.id,
-      email: data.email,
-      referralCode: data.merges.REFCODE,
-      shareUrl: data.merges.SHAREURL,
-      referralSource: data.merges.REFSOURCE,
-      totalReferrals: data.merges.REFCOUNT,
-      refereCode: data.merges.REFERECODE,
-      status: "subscribed",
-    });
+//       const response = await mailchimp.lists.updateListMember(
+//         listId,
+//         subscriber_hash,
+//         {
+//           merge_fields: {
+//             REFCOUNT: 0,
+//             SHAREURL: savedUser.shareUrl,
+//             REFCODE: savedUser.referralCode,
+//             REFSOURCE: savedUser.referralSource,
+//           },
+//         }
+//       );
+//       console.log("Successfully saved new user to DB!");
+//       return console.log("Successfully updated user field in Mailchimp!");
+//     } catch (error) {
+//       console.log("error in try catch", error);
+//       return console.log(error.message);
+//     }
+//   } else if (
+//     data.merges.REFERECODE.length > 1 &&
+//     data.merges.REFCODE.length > 1
+//   ) {
+//     //WAS REFERED BY SOMEONE
+//     console.log("I'M REFFERED BY FRIEND ==>");
+//     const user = new User({
+//       userId: data.id,
+//       email: data.email,
+//       referralCode: data.merges.REFCODE,
+//       shareUrl: data.merges.SHAREURL,
+//       referralSource: data.merges.REFSOURCE,
+//       totalReferrals: data.merges.REFCOUNT,
+//       refereCode: data.merges.REFERECODE,
+//       status: "subscribed",
+//     });
 
-    //FIND REFEREE AND INCREMENT THEIR TOTALREFERRALS
-    async function run() {
-      const refereeUser = await User.findOne({
-        referralCode: data.merges.REFERECODE,
-      });
+//     //FIND REFEREE AND INCREMENT THEIR TOTALREFERRALS
+//     async function run() {
+//       const refereeUser = await User.findOne({
+//         referralCode: data.merges.REFERECODE,
+//       });
 
-      if (refereeUser) {
-        refereeUser.totalReferrals = refereeUser.totalReferrals += 1;
+//       if (refereeUser) {
+//         refereeUser.totalReferrals = refereeUser.totalReferrals += 1;
 
-        try {
-          //  UPDATE REFEREE IN DB
-          await user.save();
-          const updatedUser = await refereeUser.save();
+//         try {
+//           //  UPDATE REFEREE IN DB
+//           await user.save();
+//           const updatedUser = await refereeUser.save();
 
-          //  UPDATE REFEREE IN MAILCHIMP
-          const addToRefcount = updatedUser.totalReferrals;
-          const email = updatedUser.email;
-          const subscriberHash = md5(email.toLowerCase());
+//           //  UPDATE REFEREE IN MAILCHIMP
+//           const addToRefcount = updatedUser.totalReferrals;
+//           const email = updatedUser.email;
+//           const subscriberHash = md5(email.toLowerCase());
 
-          const response = await mailchimp.lists.updateListMember(
-            listId,
-            subscriberHash,
-            {
-              merge_fields: {
-                REFCOUNT: addToRefcount,
-              },
-            }
-          );
-        } catch (error) {
-          console.log(error.message);
-          return next(error);
-        }
-      }
-    }
+//           const response = await mailchimp.lists.updateListMember(
+//             listId,
+//             subscriberHash,
+//             {
+//               merge_fields: {
+//                 REFCOUNT: addToRefcount,
+//               },
+//             }
+//           );
+//         } catch (error) {
+//           console.log(error.message);
+//           return next(error);
+//         }
+//       }
+//     }
 
-    run();
-  }
-});
+//     run();
+//   }
+// });
 
 // Handle referring form submit
 
@@ -459,6 +459,19 @@ app.get("/", (req, res) => {
     message: "Bad request",
   });
 });
+
+//Handle webhook request
+app.post("/", async (req, res, next) => {
+  const { type, data } = req.body;
+  console.log("WEBHOOK REQUEST =>", req.body);
+
+  // if (type !== "subscribe") {
+  //   return res.end();
+  // }
+
+  return res.send("Page you are looking for does not exist");
+});
+
 //SET DEFAULT PORT IF IN DEVELOPMENT MODE
 const PORT = process.env.PORT || 5000;
 
