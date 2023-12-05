@@ -12,6 +12,7 @@ import nodemailer from "nodemailer";
 import asyncHandler from "express-async-handler";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
+import cors from "cors";
 
 const app = express();
 
@@ -34,6 +35,7 @@ dotenv.config();
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI);
+    // console.log(process.env.MONGO_URI);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.log(error);
@@ -47,6 +49,7 @@ let seconds = today.getSeconds();
 
 //MIDDLEWARES
 app.use(morgan("dev"));
+app.use(cors());
 // app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
