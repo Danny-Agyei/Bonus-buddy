@@ -389,8 +389,12 @@ app.get("/refer", (req, res) => {
 						</div>
 					</div>
 				</div>
-
-			</div>
+				</div>
+				<div class='success-msg' style="display:none; height: fit-content; width: 500px; background-color: transparent !important; padding:30px 35px; max-width: 100%; box-sizing: border-box; margin: 0;">
+						<h1 style="color:#ffffff;font-size: 26px;line-height: 1.15em;
+					margin-bottom: 25px; font-family: 'Roboto', 'Arial', sans-serif; text-align:center;">THANK YOU!</h1>
+					<p style="font-family: 'Raleway','Roboto', sans-serif; text-align: center;  font-size:16px; line-height:1.4em; color:#ffffff;"> An email has been sent to those address. You'll receive an email from us with your coupon code as promised after they enroll on our services.</p>
+				</div>
 		</form>
 	</div>
 </div>
@@ -434,7 +438,8 @@ $(document).ready(function() {
 					dataType: "json",
 					success: function(json) {
 						if(json.success){
-							window.location.replace(redirectLink);
+							$('.main-container').hide();
+							$('.success-msg').show();
 						}else{
 							alert("Sorry, something went wrong!");
 						}
