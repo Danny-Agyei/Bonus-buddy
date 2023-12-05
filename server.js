@@ -179,10 +179,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/success", async (req, res) => {
   res.send(`<div style="display: flex; justify-content: center; padding-bottom: 40px; width: 100%; box-sizing: border-box;">
-  <div style="height:100%;max-width: 100%;margin-top: 40px; padding: 50px 10px; background:#efefef;border-radius: 5px;">
+
+  <style>
+  @import url('https://fonts.googleapis.com/css2?family=Raleway&family=Roboto:wght@400;500;700;900&display=swap');
+  </style>
+
+  <div style="height:100%;max-width: 100%;margin-top: 40px; padding: 50px 10px; background:#8BA7BD;border-radius: 5px;">
 	  <div class="main-container" style="height: fit-content; width: 500px; background-color: transparent !important; padding:0 35px; max-width: 100%; box-sizing: border-box; margin: 0;">
-		  <h1 style="font-family: Arial, sans-serif; text-align: center; font-size: 23px; line-height: 1em; margin-bottom: 10px; color: forestgreen">THANK YOU!</h1>
-		  <p style="font-family: Arial, sans-serif; text-align: center; font-size: 16px; color:#666;"> An email has been sent to those address. You'll receive an email from us with your coupon code when the enroll on our services.</p>
+		  <h1 style="color:#ffffff;font-size: 26px;line-height: 1.15em;
+			margin-bottom: 25px; font-family: 'Roboto', 'Arial', sans-serif; text-align:center;">THANK YOU!</h1>
+		  <p style="font-family: 'Raleway','Roboto', sans-serif; text-align: center;  font-size:16px; line-height:1.4em; color:#ffffff;"> An email has been sent to those address. You'll receive an email from us with your coupon code as promised after they enroll on our services.</p>
 	  </div>
 </div>
 </div>`);
@@ -234,6 +240,7 @@ app.get("/refer", (req, res) => {
 <div style="height: 100%; background-color: transparent !important;">
 
 	<style>
+	@import url('https://fonts.googleapis.com/css2?family=Raleway&family=Roboto:wght@400;500;700;900&display=swap');
 		html,
 		body {
 			background-color: transparent !important;
@@ -245,13 +252,17 @@ app.get("/refer", (req, res) => {
 		}
 
 		h1 {
-			font-size: 36px;
-			line-height: 1em;
+			color:#ffffff;
+			font-size: 26px;
+			line-height: 1.15em;
 			margin-bottom: 25px;
+			font-family: 'Roboto', 'Arial', sans-serif;
 		}
 
 		p {
-			color: #666;
+			color: #ffffff;
+			font-size: 14.5px;
+			line-height: 1.4em;
 
 		}
 
@@ -260,8 +271,8 @@ app.get("/refer", (req, res) => {
 		}
 
 		button {
-			font-family: 'Roboto';
-			font-size: 30px;
+			font-family: 'Roboto', 'Arial', sans-serif;
+			font-size: 25px;
 		}
 
 		::-webkit-input-placeholder {
@@ -327,11 +338,11 @@ app.get("/refer", (req, res) => {
 
 	</style>
 	<div style="display: flex; justify-content: center; padding-bottom: 20px; width: 100%; box-sizing: border-box;">
-		<form style="max-width: 100%; padding: 30px 10px; background:#efefef;border-radius: 5px;" id='form'>
+		<form style="max-width: 100%; padding: 30px 10px; background:#8BA7BD;border-radius: 5px;" id='form'>
 			<div class="main-container" style="height: fit-content; width: 500px; background-color: transparent !important; padding:0 35px; max-width: 100%; box-sizing: border-box; margin: 0;">
-				<h1> Refer A Friend & Get Free $50 Coupon</h1>
-				<p class="sub-title">Yes that's right! If you refer, you'll get $50 coupon once they enroll on our services.</p>
-				<p class="des" style="font-weight: 500; color: #000;">Think you know someone who would make a great fit? Enter their email below by seperating with a comma.</p>
+				<h1> Refer A Friend & Get Free Coupon to shop the Joe Cipriano Promo Masterclass Merch Shop!</h1>
+				<p class="sub-title" style="font-family: 'Raleway', 'Roboto','Arial', sans-serif;  font-size:14.5px; line-height:1.4em;">Yes that's right! If you refer, you'll shop for free, once they enroll on our services</p>
+				<p class="des" style="font-weight: 400; font-size:14.5px; line-height:1.4em; color: #ffffff; font-family: 'Raleway', 'Roboto','Arial', sans-serif;">Think you know someone who would love to to take Joe's 'Intro to Promos' and 'Promo Masterclass' online courses and SAVE money? Enter their email below. For multiple emails, separate them using commas.</p>
 
 				<div class="form-inline">
 					<div style="display: flex; position: relative;">
@@ -354,7 +365,7 @@ app.get("/refer", (req, res) => {
 							<div style=" padding: 10px 0px 0; background-color: rgba(255, 255, 255, 0); ">
 								<div style="display: flex; width: 100%; flex-direction: column;">
 									<div style="display: flex;">
-										<input required class="email" id="" placeholder="example1@gmail.com,example2@outlook.com" aria-required="true" style="color: rgb(0, 0, 0); font-family: &quot;Helvetica Neue&quot;, Arial; font-size: 16px; font-weight: 400; width: 100%; height: 55px; padding-left: 16px; border: 2px solid rgba(142, 142, 142, 0.3); border-radius: 3px; box-sizing: border-box;">
+										<input required class="email" id="" placeholder="example1@gmail.com,example2@outlook.com" aria-required="true" style="color: rgb(0, 0, 0); font-family: 'Roboto', Arial; font-size: 16px; font-weight: 400; width: 100%; height: 55px; padding-left: 16px; border: 2px solid rgba(142, 142, 142, 0.3); border-radius: 3px; box-sizing: border-box;">
 									</div>
 								</div>
 							</div>
@@ -365,17 +376,15 @@ app.get("/refer", (req, res) => {
 				<div class="wrapper" style="padding: 0 !important;">
 					<div class="message">
 						<div style="display: flex; flex-direction: column; padding: 10px 0 6px; background-color: rgba(255, 255, 255, 0); position: relative; flex: 1 1 0%;">
-							<button type="submit" class="submitBtn" style="font-family: 'Roboto', Arial, sans-serif; font-weight: 600; font-size: 20px;  color: rgb(255, 255, 255); background-color: #10a77d; border-radius: 2px; border: 0px solid rgb(34, 34, 34); border-radius: 5px; height: 60px; width: 100%; padding: 0px; margin: 0px auto; cursor: pointer;">
+							<button type="submit" class="submitBtn" style="font-family: 'Roboto', Arial, sans-serif; font-weight: 600; font-size: 20px;  color: rgb(255, 255, 255); background-color: #E81013; border-radius: 2px; border: 0px solid rgb(34, 34, 34); border-radius: 5px; height: 60px; width: 100%; padding: 0px; margin: 0px auto; cursor: pointer;">
 								<style>
 									button:hover {
-										background-color: #0f9570 !important;
+										background-color: #cb0b0d !important;
 									}
 
 								</style>
 								SUBMIT
 							</button>
-
-							<p class="error-msg" style="margin-top: 20px;text-align: center; color: red; display: none;"> There was something wrong!</p>
 
 						</div>
 					</div>
