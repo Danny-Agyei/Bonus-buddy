@@ -11,12 +11,12 @@ import md5 from "md5";
 import nodemailer from "nodemailer";
 import asyncHandler from "express-async-handler";
 import bodyParser from "body-parser";
+import mongoose from "mongoose";
 
 const app = express();
 
 //Models & DBs
 import User from "./models/user.js";
-import connectDB from "./config/db.js";
 import Hub from "./models/hub.js";
 
 //Configs
@@ -31,7 +31,15 @@ const listId = process.env.LIST_ID;
 dotenv.config();
 
 // Connect to mongodb atlas
-connectDB();
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.log(error);
+    process.exit(1);
+  }
+};
 
 //Initial variables
 let today = new Date();
@@ -453,9 +461,10 @@ app.get("/", (req, res) => {
   });
 });
 //SET DEFAULT PORT IF IN DEVELOPMENT MODE
-const port = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 
-app.listen(
-  port,
-  console.log(`Server running on ${port} in ${process.env.NODE_ENV} mode`)
-);
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on ${PORT} in ${process.env.NODE_ENV} mode`);
+  });
+});
