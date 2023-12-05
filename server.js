@@ -213,21 +213,17 @@ app.post("/refer", async (req, res) => {
           { new: true }
         );
 
-        console.log(updatedReferrals);
-        console.log(updatedUser);
-        res.json({ success: true, status: 200 });
+        return res.json({ success: true, status: 200 });
       } else {
         await userHub.save();
-        res.json({ success: true, status: 200 });
+        return res.json({ success: true, status: 200 });
       }
     } catch (error) {
       console.log(error);
-      res.json({ success: false, status: 500 });
+      return res.json({ success: false, status: 500 });
     }
-
-    console.log(userHub);
   } else {
-    res.json({ success: false, status: 500 });
+    return res.json({ success: false, status: 500 });
   }
 });
 
