@@ -304,24 +304,11 @@ app.get("/refer", (req, res) => {
 			outline: none;
 		}
 
-		h1 {
-			color:#0E1F2F;
-			font-size: 26px;
-			line-height: 1.15em;
-			margin-bottom: 20px;
-			font-family: 'Roboto', 'Arial', sans-serif;
-		}
-
 		p {
 			color: #ffffff;
 			font-size: 14.5px;
 			line-height: 1.4em;
 			margin-bottom: 20px;
-		}
-
-		button {
-			font-family: 'Roboto', 'Arial', sans-serif;
-			font-size: 25px;
 		}
 
 		::-webkit-input-placeholder {
@@ -382,9 +369,9 @@ app.get("/refer", (req, res) => {
 	<div style="display: flex; justify-content: center; padding-bottom: 20px; width: 100%; box-sizing: border-box;">
 		<form style="max-width: 100%; padding: 30px 10px; background:#8BA7BD;border-radius: 5px;" id='form'>
 			<div class="main-container" style="height: fit-content; width: 500px; background-color: transparent !important; padding:0 35px; max-width: 100%; box-sizing: border-box; margin: 0;">
-				<h1>Refer a Friend and get a coupon for FREE Joe Cipriano Promo Masterclass Merch!</h1>
-				<p class="sub-title" style="font-family: 'Raleway', 'Roboto','Arial', sans-serif;  font-size:14.5px; line-height:1.4em;">Think you know a friend or colleague who would like to take either Joe’s “Intro to Promos” or “Promo Masterclass” online courses?</p>
-				<p class="des" style="font-weight: 400; font-size:14.5px; line-height:1.4em; color: #ffffff; font-family: 'Raleway', 'Roboto','Arial', sans-serif;">Your referral will save them up to $100 and when they enroll, you'll receive a coupon to shop for free.</p>
+				<h1 style="color:#0E1F2F; font-size: 22px; line-height: 1.15em; margin-bottom: 20px; font-family: 'Roboto', 'Arial', sans-serif;">Refer a Friend and get a coupon for FREE Joe Cipriano Promo Masterclass Merch!</h1>
+				<p class="sub-title" style="font-family: 'Raleway', 'Roboto','Arial', sans-serif;  font-size:14.5px; line-height:1.4em;">Think you know a friend who would like to take either Joe’s “Intro to Promos” or “Promo Masterclass” online courses?</p>
+				<p class="des" style="font-weight: 400; font-size:14.5px; line-height:1.4em; color: #ffffff; font-family: 'Raleway', 'Roboto','Arial', sans-serif;">Your referral will save them up to $100 and when they enroll, you'll received a coupon for FREE merch.</p>
 				<p class="des" style="font-weight: 600; font-size:14.5px; line-height:1.4em; color: #ffffff; font-family: 'Raleway', 'Roboto','Arial', sans-serif; ">The more friends who sign up, the more free stuff you get!</p>
 
 				<div class="form-inline">
@@ -419,7 +406,7 @@ app.get("/refer", (req, res) => {
 				<div class="wrapper" style="padding: 0 !important;">
 					<div class="message">
 						<div style="display: flex; flex-direction: column; padding: 10px 0 6px; background-color: rgba(255, 255, 255, 0); position: relative; flex: 1 1 0%;">
-							<button type="submit" class="submitBtn" style="font-family: 'Roboto', Arial, sans-serif; font-weight: 600; font-size: 20px;  color: rgb(255, 255, 255); background-color: #E81013; border-radius: 2px; border: 0px solid rgb(34, 34, 34); border-radius: 5px; height: 60px; width: 100%; padding: 0px; margin: 0px auto; cursor: pointer;">
+							<button type="submit" class="submitBtn" style="font-family: 'Roboto', Arial, sans-serif; font-weight: 600; font-size: 18px;  color: rgb(255, 255, 255); background-color: #E81013; border-radius: 2px; border: 0px solid rgb(34, 34, 34); border-radius: 5px; height: 60px; width: 100%; padding: 0px; margin: 0px auto; cursor: pointer;">
 								<style>
 									button:hover {
 										background-color: #cb0b0d !important;
@@ -436,7 +423,7 @@ app.get("/refer", (req, res) => {
 				<div class='success-msg' style="display:none; height: fit-content; width: 500px; background-color: transparent !important; padding:30px 35px; max-width: 100%; box-sizing: border-box; margin: 0;">
 						<h1 style="color:#ffffff;font-size: 26px;line-height: 1.15em;
 					margin-bottom: 25px; font-family: 'Roboto', 'Arial', sans-serif; text-align:center;">THANK YOU!</h1>
-					<p style="font-family: 'Raleway','Roboto', sans-serif; text-align: center;  font-size:16px; line-height:1.4em; color:#ffffff;"> An email has been sent to those address. You'll receive an email from us with your coupon code as promised after they enroll on our services.</p>
+					<p style="font-family: 'Raleway','Roboto', sans-serif; text-align: center;  font-size:16px; line-height:1.4em; color:#ffffff;">An email has been sent to your friend. If they enroll in one of our online courses with your discount code, you'll be sent your coupon code for FREE stuff.</p>
 				</div>
 		</form>
 	</div>
