@@ -8,6 +8,9 @@ const hubSchema = new Schema({
     required: true,
     unique: true,
   },
+  refCount: {
+    type: Number,
+  },
   referrals: [],
 });
 
