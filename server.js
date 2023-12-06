@@ -305,10 +305,10 @@ app.get("/refer", (req, res) => {
 		}
 
 		h1 {
-			color:#ffffff;
+			color:#0E1F2F;
 			font-size: 26px;
 			line-height: 1.15em;
-			margin-bottom: 25px;
+			margin-bottom: 20px;
 			font-family: 'Roboto', 'Arial', sans-serif;
 		}
 
@@ -316,11 +316,7 @@ app.get("/refer", (req, res) => {
 			color: #ffffff;
 			font-size: 14.5px;
 			line-height: 1.4em;
-
-		}
-
-		.sub-title {
-			margin-bottom: 2em;
+			margin-bottom: 20px;
 		}
 
 		button {
@@ -369,13 +365,6 @@ app.get("/refer", (req, res) => {
 
 		}
 
-		@media only screen and (max-width: 480px) {
-
-			button {
-				font-size: 30px !important;
-			}
-		}
-
 		@media (min-width:360px) and (max-width:640px) {
 
 			.main-container {
@@ -393,13 +382,14 @@ app.get("/refer", (req, res) => {
 	<div style="display: flex; justify-content: center; padding-bottom: 20px; width: 100%; box-sizing: border-box;">
 		<form style="max-width: 100%; padding: 30px 10px; background:#8BA7BD;border-radius: 5px;" id='form'>
 			<div class="main-container" style="height: fit-content; width: 500px; background-color: transparent !important; padding:0 35px; max-width: 100%; box-sizing: border-box; margin: 0;">
-				<h1> Refer A Friend & Get Free Coupon to shop the Joe Cipriano Promo Masterclass Merch Shop!</h1>
-				<p class="sub-title" style="font-family: 'Raleway', 'Roboto','Arial', sans-serif;  font-size:14.5px; line-height:1.4em;">Yes that's right! If you refer, you'll shop for free, once they enroll on our services</p>
-				<p class="des" style="font-weight: 400; font-size:14.5px; line-height:1.4em; color: #ffffff; font-family: 'Raleway', 'Roboto','Arial', sans-serif;">Think you know someone who would love to to take Joe's 'Intro to Promos' and 'Promo Masterclass' online courses and SAVE money? Enter their email below. For multiple emails, separate them using commas.</p>
+				<h1>Refer a Friend and get a coupon for FREE Joe Cipriano Promo Masterclass Merch!</h1>
+				<p class="sub-title" style="font-family: 'Raleway', 'Roboto','Arial', sans-serif;  font-size:14.5px; line-height:1.4em;">Think you know a friend or colleague who would like to take either Joe’s “Intro to Promos” or “Promo Masterclass” online courses?</p>
+				<p class="des" style="font-weight: 400; font-size:14.5px; line-height:1.4em; color: #ffffff; font-family: 'Raleway', 'Roboto','Arial', sans-serif;">Your referral will save them up to $100 and when they enroll, you'll receive a coupon to shop for free.</p>
+				<p class="des" style="font-weight: 600; font-size:14.5px; line-height:1.4em; color: #ffffff; font-family: 'Raleway', 'Roboto','Arial', sans-serif; ">The more friends who sign up, the more free stuff you get!</p>
 
 				<div class="form-inline">
 					<div style="display: flex; position: relative;">
-						<div style="display: flex; flex-direction: column; padding: 0px; padding-top: 20px;  position: relative; flex: 1 1 0%;">
+						<div style="display: flex; flex-direction: column; padding: 0px;  position: relative; flex: 1 1 0%;">
 							<style>
 								* {
 									margin-block: unset;
