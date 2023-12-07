@@ -20,16 +20,18 @@ const app = express();
 import User from "./models/user.js";
 import Hub from "./models/hub.js";
 
-//Configs
-mailchimp.setConfig({
-  apiKey: process.env.MAILCHIMP_KEY,
-  server: "us12",
-});
-
-const listId = process.env.LIST_ID;
-
 // INTITIALIZE APP ENVIROMENT VARIABLES
 dotenv.config();
+
+const apiKey = process.env.MAILCHIMP_KEY;
+const listId = process.env.LIST_ID;
+const serverPrefix = process.env.SERVER_PREFIX;
+
+//Configs
+mailchimp.setConfig({
+  apiKey,
+  server: serverPrefix,
+});
 
 // Connect to mongodb atlas
 const connectDB = async () => {
@@ -50,19 +52,46 @@ let seconds = today.getSeconds();
 //MIDDLEWARES
 app.use(morgan("dev"));
 app.use(cors());
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
 
 // Middleware to parse JSON and URL-encoded data
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.get("/user", async (req, res) => {
+  const email = "dr4lyf@gmail.com";
+  const subscriber_hash = md5(email.toLowerCase());
+
+  try {
+    const response = await mailchimp.lists.getListMember(
+      listId,
+      subscriber_hash
+    );
+
+    const userRefs = response.merge_fields.TEST;
+
+    const updateResponse = await mailchimp.lists.updateListMember(
+      listId,
+      "dr4lyf@gmail.com",
+      {
+        merge_fields: {
+          LNAME: "Agyei",
+          TEST: userRefs + "test323@gmail.com |",
+        },
+      }
+    );
+    return res.json({ user: updateResponse });
+  } catch (error) {
+    console.log(error.message);
+    return res.json({ error: error.message });
+  }
+});
 
 //Handle webhook request
 
 app.post("/", async (req, res, next) => {
   const { type, data } = req.body;
 
-  const email = data.email;
+  const refereeEmail = data.email;
 
   if (type !== "subscribe") {
     console.log("Not subscribe");
@@ -72,11 +101,19 @@ app.post("/", async (req, res, next) => {
     try {
       //Find the referral
       const foundUser = await Hub.findOneAndUpdate({
-        referrals: { $in: [email] },
+        referrals: { $in: [refereeEmail] },
       });
 
       if (foundUser) {
         console.log(foundUser.email);
+
+        //Get referral data from Mailchimp
+        const referralEmail = md5(foundUser.email.toLowerCase());
+
+        const referralInfo = await mailchimp.lists.getListMember(
+          listId,
+          referralEmail
+        );
 
         //Update referral in MongoDB
         const updatedUser = await Hub.findOneAndUpdate(
@@ -90,12 +127,13 @@ app.post("/", async (req, res, next) => {
         //Update referral in Mailchimp
         const subscriber_hash = md5(foundUser.email.toLowerCase());
 
-        const response = await mailchimp.lists.updateListMember(
+        const updateResponse = await mailchimp.lists.updateListMember(
           listId,
           subscriber_hash,
           {
             merge_fields: {
               REFCOUNT: updatedUser.refCount,
+              REFS: referralInfo.merge_fields.REFS + refereeEmail + "|",
             },
           }
         );
@@ -112,152 +150,13 @@ app.post("/", async (req, res, next) => {
   }
 });
 
-// app.post("/", async (req, res, next) => {
-//   const { type, data } = req.body;
-
-//   if (type !== "subscribe") {
-//     return res.end();
-//   }
-
-//   console.log("IM MAILCHIMP WEBHOOK REQUEST ==>");
-//   //CHECK TO SEE IF COMPLETELY NEW SUBSCRIBER
-//   if (data.merges.REFCODE.length < 1 && data.merges.REFERECODE.length < 1) {
-//     try {
-//       console.log("IM NEW SUBSCRIBER ==>");
-//       const generatedCode = voucher_codes.generate({
-//         length: 8,
-//         count: 1,
-//       });
-
-//       let referralCode = generatedCode[0] + seconds;
-
-//       const token = jwt.sign(
-//         {
-//           user: data.email,
-//         },
-//         "secretKey"
-//       );
-
-//       const newUser = new User({
-//         email: data.email,
-//         referralCode: referralCode,
-//         shareUrl: process.env.SHARE_URL + "=" + referralCode,
-//         referralSource: token,
-//         totalReferrals: 0,
-//         status: "subscribed",
-//       });
-
-//       console.log("Im in try code!");
-//       console.log("USER INFO ==>", newUser);
-
-//       const savedUser = await newUser.save();
-//       const subscriber_hash = md5(savedUser.email.toLowerCase());
-
-//       const response = await mailchimp.lists.updateListMember(
-//         listId,
-//         subscriber_hash,
-//         {
-//           merge_fields: {
-//             REFCOUNT: 0,
-//             SHAREURL: savedUser.shareUrl,
-//             REFCODE: savedUser.referralCode,
-//             REFSOURCE: savedUser.referralSource,
-//           },
-//         }
-//       );
-//       console.log("Successfully saved new user to DB!");
-//       return console.log("Successfully updated user field in Mailchimp!");
-//     } catch (error) {
-//       console.log("error in try catch", error);
-//       return console.log(error.message);
-//     }
-//   } else if (
-//     data.merges.REFERECODE.length > 1 &&
-//     data.merges.REFCODE.length > 1
-//   ) {
-//     //WAS REFERED BY SOMEONE
-//     console.log("I'M REFFERED BY FRIEND ==>");
-//     const user = new User({
-//       userId: data.id,
-//       email: data.email,
-//       referralCode: data.merges.REFCODE,
-//       shareUrl: data.merges.SHAREURL,
-//       referralSource: data.merges.REFSOURCE,
-//       totalReferrals: data.merges.REFCOUNT,
-//       refereCode: data.merges.REFERECODE,
-//       status: "subscribed",
-//     });
-
-//     //FIND REFEREE AND INCREMENT THEIR TOTALREFERRALS
-//     async function run() {
-//       const refereeUser = await User.findOne({
-//         referralCode: data.merges.REFERECODE,
-//       });
-
-//       if (refereeUser) {
-//         refereeUser.totalReferrals = refereeUser.totalReferrals += 1;
-
-//         try {
-//           //  UPDATE REFEREE IN DB
-//           await user.save();
-//           const updatedUser = await refereeUser.save();
-
-//           //  UPDATE REFEREE IN MAILCHIMP
-//           const addToRefcount = updatedUser.totalReferrals;
-//           const email = updatedUser.email;
-//           const subscriberHash = md5(email.toLowerCase());
-
-//           const response = await mailchimp.lists.updateListMember(
-//             listId,
-//             subscriberHash,
-//             {
-//               merge_fields: {
-//                 REFCOUNT: addToRefcount,
-//               },
-//             }
-//           );
-//         } catch (error) {
-//           console.log(error.message);
-//           return next(error);
-//         }
-//       }
-//     }
-
-//     run();
-//   }
-// });
-
-// Handle referring form submit
-
-app.get("/success", async (req, res) => {
-  res.send(`<div style="display: flex; justify-content: center; padding-bottom: 40px; width: 100%; box-sizing: border-box;">
-
-  <style>
-  @import url('https://fonts.googleapis.com/css2?family=Raleway&family=Roboto:wght@400;500;700;900&display=swap');
-  </style>
-
-  <div style="height:100%;max-width: 100%;margin-top: 40px; padding: 50px 10px; background:#8BA7BD;border-radius: 5px;">
-	  <div class="main-container" style="height: fit-content; width: 500px; background-color: transparent !important; padding:0 35px; max-width: 100%; box-sizing: border-box; margin: 0;">
-		  <h1 style="color:#ffffff;font-size: 26px;line-height: 1.15em;
-			margin-bottom: 25px; font-family: 'Roboto', 'Arial', sans-serif; text-align:center;">THANK YOU!</h1>
-		  <p style="font-family: 'Raleway','Roboto', sans-serif; text-align: center;  font-size:16px; line-height:1.4em; color:#ffffff;"> An email has been sent to those address. You'll receive an email from us with your coupon code as promised after they enroll on our services.</p>
-	  </div>
-</div>
-</div>`);
-});
-
 app.post("/refer", async (req, res) => {
   const { referees, username } = req.body;
 
   if (username) {
-    const userHub = new Hub({
-      email: username,
-      refCount: 0,
-      referrals: referees,
-    });
-
     try {
       const foundUser = await Hub.findOne({ email: username });
+
       if (foundUser) {
         const updatedReferrals = referees.concat(foundUser.referrals);
 
@@ -274,6 +173,12 @@ app.post("/refer", async (req, res) => {
 
         return res.json({ success: true, status: 200 });
       } else {
+        const userHub = new Hub({
+          email: username,
+          refCount: 0,
+          referrals: referees,
+        });
+
         await userHub.save();
         return res.json({ success: true, status: 200 });
       }
@@ -421,8 +326,8 @@ app.get("/refer", (req, res) => {
 				</div>
 				</div>
 				<div class='success-msg' style="display:none; height: fit-content; width: 500px; background-color: transparent !important; padding:30px 35px; max-width: 100%; box-sizing: border-box; margin: 0;">
-						<h1 style="color:#ffffff;font-size: 26px;line-height: 1.15em;
-					margin-bottom: 25px; font-family: 'Roboto', 'Arial', sans-serif; text-align:center;">THANK YOU!</h1>
+						<h1 style="color:#0E1F2F;font-size: 26px;line-height: 1.15em;
+					margin-bottom: 10px; font-family: 'Roboto', 'Arial', sans-serif; text-align:center;">THANK YOU!</h1>
 					<p style="font-family: 'Raleway','Roboto', sans-serif; text-align: center;  font-size:16px; line-height:1.4em; color:#ffffff;">An email has been sent to your friend. If they enroll in one of our online courses with your discount code, you'll be sent your coupon code for FREE stuff.</p>
 				</div>
 		</form>
@@ -497,7 +402,7 @@ $(document).ready(function() {
   res.send(htmlForm);
 });
 
-app.get("/", (req, res) => {
+app.get("*", (req, res) => {
   res.json({
     status: 400,
     message: "Bad request",
