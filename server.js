@@ -58,40 +58,40 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/user", async (req, res) => {
-  const email = "dr4lyf@gmail.com";
-  const subscriber_hash = md5(email.toLowerCase());
-
   try {
-    const response = await mailchimp.lists.getListMember(
-      listId,
-      subscriber_hash
-    );
-
-    const userRefs = response.merge_fields.TEST;
-
-    const updateResponse = await mailchimp.lists.updateListMember(
-      listId,
-      "dr4lyf@gmail.com",
-      {
-        merge_fields: {
-          LNAME: "Agyei",
-          TEST: userRefs + "test323@gmail.com |",
-        },
-      }
-    );
-    return res.json({ user: updateResponse });
+    const response = await mailchimp.lists.addListMergeField(listId, {
+      name: "Course Purchased",
+      type: "text",
+      tag: "COURSE",
+    });
+    console.log(response);
+    return res.json({ user: response });
   } catch (error) {
     console.log(error.message);
-    return res.json({ error: error.message });
+    return res.json({ error: error });
   }
 });
 
-//Handle webhook request
+//Webhook @Mailchimp - Purchased made on Eventbrite
+app.post("/webhook", async (req, res) => {
+  const reqBody = await req.body;
+  const data = req.body;
 
+  console.log("INCOMING REQUEST FROM MAILCHIMP =>");
+  console.log(reqBody);
+  console.log("DATA FROM MAILCHIMP =>");
+  console.log(data);
+
+  req.end();
+});
+
+//Handle webhook request
 app.post("/", async (req, res, next) => {
   const { type, data } = req.body;
 
   const refereeEmail = data.email;
+
+  console.log("MAIN WEBHOOK =>", data);
 
   if (type !== "subscribe") {
     console.log("Not subscribe");
@@ -342,7 +342,6 @@ app.get("/refer", (req, res) => {
 <script type="text/javascript">
 $(document).ready(function() {
 
-
 	function getQueryParameter(name) {
 		const urlParams = new URLSearchParams(window.location.search);
 		return urlParams.get(name);
@@ -350,23 +349,25 @@ $(document).ready(function() {
 
 	const userEmail = getQueryParameter('user');
 
-	const redirectLink = 'https://giant-pink-raincoat.cyclic.app/success';
+	userEmail && localStorage.setItem('userEmail',userEmail);
+	console.log(userEmail);
 	
-
-	if (userEmail) {
+	
 		$('#form').submit(function(e) {
 			e.preventDefault();
 
 			let email = $('.email').val();
 
+			const ref = localStorage.getItem('userEmail');
+			console.log('user from storage',ref);
+
 
 			const referees = email.split(',');
-
-			if (email.length > 0 && email.includes("@")) {
+			if(userEmail || ref){
 				$.ajax({
 					url: 'https://giant-pink-raincoat.cyclic.app/refer',
 					data: {
-						"username": userEmail,
+						"username": userEmail || ref,
 						"referees": referees
 					},
 					type: "post",
@@ -383,17 +384,12 @@ $(document).ready(function() {
 					error: function(jqXHR, textStatus, errorThrown) {
 						alert("Sorry, something went wrong!");
 					}
-				});
-			} else {
-				alert("Enter a valild email address")
+				})
+			} else{
+				alert('Something went wrong, reload the page and try again!')
 			}
-
-
+				
 		})
-	} else {
-		alert("invalid url")
-	}
-
 
 })
 
