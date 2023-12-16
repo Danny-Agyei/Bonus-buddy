@@ -25,6 +25,7 @@ dotenv.config();
 
 const apiKey = process.env.MAILCHIMP_KEY;
 const listId = process.env.LIST_ID;
+const refListId = process.env.REFERRALS_LIST_ID;
 const serverPrefix = process.env.SERVER_PREFIX;
 
 //Configs
@@ -157,6 +158,14 @@ app.post("/refer", async (req, res) => {
     try {
       const foundUser = await Hub.findOne({ email: username });
 
+      const members = referees.map((ref) => ({
+        email_address: ref,
+        status: "subscribed",
+        merge_fields: {
+          REFERBY: username,
+        },
+      }));
+
       if (foundUser) {
         const updatedReferrals = referees.concat(foundUser.referrals);
 
@@ -171,6 +180,11 @@ app.post("/refer", async (req, res) => {
           { new: true }
         );
 
+        const response = await mailchimp.lists.batchListMembers(refListId, {
+          members,
+        });
+        console.log(response);
+
         return res.json({ success: true, status: 200 });
       } else {
         const userHub = new Hub({
@@ -180,6 +194,12 @@ app.post("/refer", async (req, res) => {
         });
 
         await userHub.save();
+
+        const response = await mailchimp.lists.batchListMembers(refListId, {
+          members,
+        });
+        console.log(response);
+
         return res.json({ success: true, status: 200 });
       }
     } catch (error) {
