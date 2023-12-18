@@ -79,7 +79,7 @@ app.post("/webhook", async (req, res) => {
   console.log("DATA FROM MAILCHIMP =>");
   console.log(data);
 
-  req.end();
+  res.end();
 
   // try {
   //   const inviteeEmail = "test@site.com"; //invite purchase event
