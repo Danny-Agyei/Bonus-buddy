@@ -19,6 +19,7 @@ const app = express();
 //Models & DBs
 import User from "./models/user.js";
 import Hub from "./models/hub.js";
+import { sendEmail } from "./util/sendMail.js";
 
 // INTITIALIZE APP ENVIROMENT VARIABLES
 dotenv.config();
@@ -60,13 +61,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/user", async (req, res) => {
   try {
-    const response = await mailchimp.lists.addListMergeField(listId, {
-      name: "Course Purchased",
-      type: "text",
-      tag: "COURSE",
-    });
-    console.log(response);
-    return res.json({ user: response });
+    await sendEmail("coderdanny2018@gmail.com", "markgee12@site.com");
+    return res.json({ success: true });
   } catch (error) {
     console.log(error.message);
     return res.json({ error: error });
@@ -84,6 +80,45 @@ app.post("/webhook", async (req, res) => {
   console.log(data);
 
   req.end();
+
+  // try {
+  //   const inviteeEmail = "test@site.com"; //invite purchase event
+
+  //   const foundReferrer = await Hub.findOne({
+  //     referrals: { $in: [inviteeEmail] },
+  //   });
+
+  //   //They were refer
+  //   if (foundReferrer) {
+  //     //Update referral
+  //     const updatedUser = await Hub.findOneAndUpdate(
+  //       {
+  //         email: foundReferrer.email,
+  //       },
+  //       { $set: { refCount: foundReferrer.refCount + 1 } },
+  //       { new: true }
+  //     );
+
+  //     //Update referral in Mailchimp
+  //     const subscriber_hash = md5(updatedUser.email.toLowerCase());
+
+  //     await mailchimp.lists.updateListMember(listId, subscriber_hash, {
+  //       merge_fields: {
+  //         REFCOUNT: updatedUser.refCount,
+  //         REFS: refereeEmail,
+  //       },
+  //     });
+
+  //     await sendEmail(updatedUser.email, inviteeEmail);
+  //     return res.end();
+  //   }
+
+  //   // They weren't refer
+  //   return res.end();
+  // } catch (error) {
+  //   console.log(error.message);
+  //   return res.end();
+  // }
 });
 
 //Handle webhook request
