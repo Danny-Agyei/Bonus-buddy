@@ -194,6 +194,7 @@ app.post("/", async (req, res, next) => {
   //     res.end();
   //   }
   // }
+  res.end();
 });
 
 app.post("/refer", async (req, res) => {
