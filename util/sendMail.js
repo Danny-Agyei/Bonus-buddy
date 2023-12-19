@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 
-export const sendEmail = async (referrer, invitee) => {
+export const sendEmail = async (referrer, invitee, eventName) => {
   const mailDescription = `<!DOCTYPE html>
 
   <html lang="en" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml">
@@ -132,7 +132,7 @@ export const sendEmail = async (referrer, invitee) => {
                                                           <tr>
                                                               <td class="pad">
                                                                   <div style="color:#101112;direction:ltr;font-family:Arial, Helvetica, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:left;mso-line-height-alt:19.2px;">
-                                                                      <p style="margin: 0; margin-bottom: 16px;">I wanted to inform you that <strong><a href="mailto:${referrer}" rel="noopener" style="text-decoration: none; color: #56a2f2;" target="_blank" title="${referrer}"><strong>${referrer}</strong></a></strong> has successfully referred <strong><strong><a href="mailto:${invitee}" rel="noopener" style="text-decoration: none; color: #56a2f2;" target="_blank" title="${invitee}"><strong><strong>${invitee}</strong></strong></a></strong></strong>, who has just enrolled in our upcoming event - <strong>Promo masterclass.</strong></p>
+                                                                      <p style="margin: 0; margin-bottom: 16px;">I wanted to inform you that <strong><a href="mailto:${referrer}" rel="noopener" style="text-decoration: none; color: #56a2f2;" target="_blank" title="${referrer}"><strong>${referrer}</strong></a></strong> has successfully referred <strong><strong><a href="mailto:${invitee}" rel="noopener" style="text-decoration: none; color: #56a2f2;" target="_blank" title="${invitee}"><strong><strong>${invitee}</strong></strong></a></strong></strong>, who has just enrolled in our upcoming event - <strong>${eventName}</strong></p>
                                                                       <p style="margin: 0; margin-bottom: 16px;">As a token of our appreciation for their referral, could you please take care of this and ensure that the campaign with their gift is dispatched promptly?</p>
                                                                       <p style="margin: 0; margin-bottom: 16px;"> </p>
                                                                       <p style="margin: 0; margin-bottom: 16px;">Best regards,</p>

@@ -207,7 +207,7 @@ app.post("/", async (req, res, next) => {
           },
         });
         console.log("EMAIL SENDING...");
-        await sendEmail(updatedUser.email, `${name} - ${email}`);
+        await sendEmail(updatedUser.email, `${name} - ${email}`, eventName);
         return res.end();
       }
     }
