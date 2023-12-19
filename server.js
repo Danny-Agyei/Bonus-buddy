@@ -154,10 +154,10 @@ app.post("/", async (req, res, next) => {
       api_url,
     } = reqBody;
 
-    console.log("ACTION =>", action);
-
     if (action.toLowerCase() === "order.placed") {
       //Fetch Order Data
+      console.log("ACTION =>", action);
+
       const orderResponse = await axios.get(api_url, {
         headers: {
           Authorization: `Bearer ${process.env.EVENT_PRIVATE_TOKEN}`,
@@ -206,7 +206,7 @@ app.post("/", async (req, res, next) => {
             REFS: email,
           },
         });
-
+        console.log("EMAIL SENDING...");
         await sendEmail(updatedUser.email, `${name} - ${email}`);
         return res.end();
       }
