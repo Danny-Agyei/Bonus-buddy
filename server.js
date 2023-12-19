@@ -19,6 +19,7 @@ const app = express();
 //Models & DBs
 import User from "./models/user.js";
 import Hub from "./models/hub.js";
+import axios from "axios";
 import { sendEmail } from "./util/sendMail.js";
 
 // INTITIALIZE APP ENVIROMENT VARIABLES
@@ -61,18 +62,73 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/user", async (req, res) => {
   try {
-    const email = "joe@promomasterclass.com";
+    const reqBody = await req.body;
 
-    const subscriber_hash = md5(email.toLowerCase());
+    const {
+      config: { action },
+      api_url,
+    } = reqBody;
 
-    const response = await mailchimp.lists.getListMember(
-      listId,
-      subscriber_hash
-    );
+    console.log("ACTION =>", action);
 
-    return res.json({ data: response });
+    if (action.toLowerCase() === "order.placed") {
+      //Fetch Order Data
+      const orderResponse = await axios.get(api_url, {
+        headers: {
+          Authorization: `Bearer ${process.env.EVENT_PRIVATE_TOKEN}`,
+        },
+      });
+
+      const {
+        data: { name, email, event_id },
+      } = response;
+
+      //Fetch Event Data
+      const eventResponse = await axios.get(
+        `https://www.eventbriteapi.com/v3/events/${event_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.EVENT_PRIVATE_TOKEN}`,
+          },
+        }
+      );
+
+      //Get Event Name
+      const eventName = eventResponse.data.name.text;
+
+      //Find Referrer
+      const foundReferrer = await Hub.findOne({
+        referrals: { $in: [email] },
+      });
+
+      //They were refer
+      if (foundReferrer) {
+        //Update referral
+        const updatedUser = await Hub.findOneAndUpdate(
+          {
+            email: foundReferrer.email,
+          },
+          { $set: { refCount: foundReferrer.refCount + 1 } },
+          { new: true }
+        );
+
+        //Update referral in Mailchimp
+        const subscriber_hash = md5(updatedUser.email.toLowerCase());
+
+        await mailchimp.lists.updateListMember(listId, subscriber_hash, {
+          merge_fields: {
+            REFCOUNT: updatedUser.refCount,
+            REFS: email,
+          },
+        });
+
+        await sendEmail(updatedUser.email, `${name} - ${email}`);
+        return res.end();
+      }
+    }
+    return res.end();
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
     return res.json({ error: error });
   }
 });
@@ -80,121 +136,85 @@ app.get("/user", async (req, res) => {
 //Webhook @Mailchimp - Purchased made on Eventbrite
 app.post("/webhook", async (req, res) => {
   const reqBody = await req.body;
-  const data = req.body;
 
   console.log("INCOMING REQUEST FROM MAILCHIMP =>");
   console.log(reqBody);
-  console.log("DATA FROM MAILCHIMP =>");
-  console.log(data);
 
   res.end();
-
-  // try {
-  //   const inviteeEmail = "test@site.com"; //invite purchase event
-
-  //   const foundReferrer = await Hub.findOne({
-  //     referrals: { $in: [inviteeEmail] },
-  //   });
-
-  //   //They were refer
-  //   if (foundReferrer) {
-  //     //Update referral
-  //     const updatedUser = await Hub.findOneAndUpdate(
-  //       {
-  //         email: foundReferrer.email,
-  //       },
-  //       { $set: { refCount: foundReferrer.refCount + 1 } },
-  //       { new: true }
-  //     );
-
-  //     //Update referral in Mailchimp
-  //     const subscriber_hash = md5(updatedUser.email.toLowerCase());
-
-  //     await mailchimp.lists.updateListMember(listId, subscriber_hash, {
-  //       merge_fields: {
-  //         REFCOUNT: updatedUser.refCount,
-  //         REFS: refereeEmail,
-  //       },
-  //     });
-
-  //     await sendEmail(updatedUser.email, inviteeEmail);
-  //     return res.end();
-  //   }
-
-  //   // They weren't refer
-  //   return res.end();
-  // } catch (error) {
-  //   console.log(error.message);
-  //   return res.end();
-  // }
 });
 
 //Handle webhook request
 app.post("/", async (req, res, next) => {
-  const data = await req.body;
-  const reqBody = req.body;
+  try {
+    const reqBody = await req.body;
 
-  // const refereeEmail = data.email;
+    const {
+      config: { action },
+      api_url,
+    } = reqBody;
 
-  console.log("MAIN WEBHOOK =>", data);
-  console.log("Eventbrite =>", reqBody);
+    console.log("ACTION =>", action);
 
-  // if (type !== "subscribe") {
-  //   console.log("Not subscribe");
-  //   console.log(type, data);
-  //   return res.end();
-  // } else {
-  //   try {
-  //     //Find the referral
-  //     const foundUser = await Hub.findOneAndUpdate({
-  //       referrals: { $in: [refereeEmail] },
-  //     });
+    if (action.toLowerCase() === "order.placed") {
+      //Fetch Order Data
+      const orderResponse = await axios.get(api_url, {
+        headers: {
+          Authorization: `Bearer ${process.env.EVENT_PRIVATE_TOKEN}`,
+        },
+      });
 
-  //     if (foundUser) {
-  //       console.log(foundUser.email);
+      const {
+        data: { name, email, event_id },
+      } = response;
 
-  //       //Get referral data from Mailchimp
-  //       const referralEmail = md5(foundUser.email.toLowerCase());
+      //Fetch Event Data
+      const eventResponse = await axios.get(
+        `https://www.eventbriteapi.com/v3/events/${event_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.EVENT_PRIVATE_TOKEN}`,
+          },
+        }
+      );
 
-  //       const referralInfo = await mailchimp.lists.getListMember(
-  //         listId,
-  //         referralEmail
-  //       );
+      //Get Event Name
+      const eventName = eventResponse.data.name.text;
 
-  //       //Update referral in MongoDB
-  //       const updatedUser = await Hub.findOneAndUpdate(
-  //         {
-  //           email: foundUser.email,
-  //         },
-  //         { $set: { refCount: foundUser.refCount + 1 } },
-  //         { new: true }
-  //       );
+      //Find Referrer
+      const foundReferrer = await Hub.findOne({
+        referrals: { $in: [email] },
+      });
 
-  //       //Update referral in Mailchimp
-  //       const subscriber_hash = md5(foundUser.email.toLowerCase());
+      //They were refer
+      if (foundReferrer) {
+        //Update referral
+        const updatedUser = await Hub.findOneAndUpdate(
+          {
+            email: foundReferrer.email,
+          },
+          { $set: { refCount: foundReferrer.refCount + 1 } },
+          { new: true }
+        );
 
-  //       const updateResponse = await mailchimp.lists.updateListMember(
-  //         listId,
-  //         subscriber_hash,
-  //         {
-  //           merge_fields: {
-  //             REFCOUNT: updatedUser.refCount,
-  //             REFS: referralInfo.merge_fields.REFS + refereeEmail + "|",
-  //           },
-  //         }
-  //       );
+        //Update referral in Mailchimp
+        const subscriber_hash = md5(updatedUser.email.toLowerCase());
 
-  //       return res.end();
-  //     } else {
-  //       console.log("User not found");
-  //       return res.end();
-  //     }
-  //   } catch (error) {
-  //     console.log(error.message);
-  //     res.end();
-  //   }
-  // }
-  res.end();
+        await mailchimp.lists.updateListMember(listId, subscriber_hash, {
+          merge_fields: {
+            REFCOUNT: updatedUser.refCount,
+            REFS: email,
+          },
+        });
+
+        await sendEmail(updatedUser.email, `${name} - ${email}`);
+        return res.end();
+      }
+    }
+    return res.end();
+  } catch (error) {
+    console.log(error);
+    return res.json({ error: error });
+  }
 });
 
 app.post("/refer", async (req, res) => {
