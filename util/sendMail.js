@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 
-export const sendEmail = (referrer, invitee) => {
+export const sendEmail = async (referrer, invitee) => {
   const mailDescription = `<!DOCTYPE html>
 
   <html lang="en" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml">
@@ -169,7 +169,7 @@ export const sendEmail = (referrer, invitee) => {
     },
   });
 
-  async function main() {
+  try {
     // send mail with defined transport object
     const info = await transporter.sendMail({
       from: '"Joe Cipriano" <info@merkadobarkada.com>', // sender address
@@ -181,7 +181,7 @@ export const sendEmail = (referrer, invitee) => {
     });
 
     console.log("Message sent: %s", info.messageId);
+  } catch (error) {
+    console.log("Error sending mail...", error.message);
   }
-
-  main().catch(console.error);
 };
