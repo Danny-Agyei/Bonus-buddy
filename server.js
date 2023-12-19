@@ -61,76 +61,77 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/user", async (req, res) => {
-  try {
-    const reqBody = await req.body;
+  // try {
+  //   const reqBody = await req.body;
 
-    const {
-      config: { action },
-      api_url,
-    } = reqBody;
+  //   const {
+  //     config: { action },
+  //     api_url,
+  //   } = reqBody;
 
-    console.log("ACTION =>", action);
+  //   console.log("ACTION =>", action);
 
-    if (action.toLowerCase() === "order.placed") {
-      //Fetch Order Data
-      const orderResponse = await axios.get(api_url, {
-        headers: {
-          Authorization: `Bearer ${process.env.EVENT_PRIVATE_TOKEN}`,
-        },
-      });
+  //   if (action.toLowerCase() === "order.placed") {
+  //     //Fetch Order Data
+  //     const orderResponse = await axios.get(api_url, {
+  //       headers: {
+  //         Authorization: `Bearer ${process.env.EVENT_PRIVATE_TOKEN}`,
+  //       },
+  //     });
 
-      const {
-        data: { name, email, event_id },
-      } = response;
+  //     const {
+  //       data: { name, email, event_id },
+  //     } = response;
 
-      //Fetch Event Data
-      const eventResponse = await axios.get(
-        `https://www.eventbriteapi.com/v3/events/${event_id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.EVENT_PRIVATE_TOKEN}`,
-          },
-        }
-      );
+  //     //Fetch Event Data
+  //     const eventResponse = await axios.get(
+  //       `https://www.eventbriteapi.com/v3/events/${event_id}`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${process.env.EVENT_PRIVATE_TOKEN}`,
+  //         },
+  //       }
+  //     );
 
-      //Get Event Name
-      const eventName = eventResponse.data.name.text;
+  //     //Get Event Name
+  //     const eventName = eventResponse.data.name.text;
 
-      //Find Referrer
-      const foundReferrer = await Hub.findOne({
-        referrals: { $in: [email] },
-      });
+  //     //Find Referrer
+  //     const foundReferrer = await Hub.findOne({
+  //       referrals: { $in: [email] },
+  //     });
 
-      //They were refer
-      if (foundReferrer) {
-        //Update referral
-        const updatedUser = await Hub.findOneAndUpdate(
-          {
-            email: foundReferrer.email,
-          },
-          { $set: { refCount: foundReferrer.refCount + 1 } },
-          { new: true }
-        );
+  //     //They were refer
+  //     if (foundReferrer) {
+  //       //Update referral
+  //       const updatedUser = await Hub.findOneAndUpdate(
+  //         {
+  //           email: foundReferrer.email,
+  //         },
+  //         { $set: { refCount: foundReferrer.refCount + 1 } },
+  //         { new: true }
+  //       );
 
-        //Update referral in Mailchimp
-        const subscriber_hash = md5(updatedUser.email.toLowerCase());
+  //       //Update referral in Mailchimp
+  //       const subscriber_hash = md5(updatedUser.email.toLowerCase());
 
-        await mailchimp.lists.updateListMember(listId, subscriber_hash, {
-          merge_fields: {
-            REFCOUNT: updatedUser.refCount,
-            REFS: email,
-          },
-        });
+  //       await mailchimp.lists.updateListMember(listId, subscriber_hash, {
+  //         merge_fields: {
+  //           REFCOUNT: updatedUser.refCount,
+  //           REFS: email,
+  //         },
+  //       });
 
-        await sendEmail(updatedUser.email, `${name} - ${email}`);
-        return res.end();
-      }
-    }
-    return res.end();
-  } catch (error) {
-    console.log(error);
-    return res.json({ error: error });
-  }
+  //       await sendEmail(updatedUser.email, `${name} - ${email}`);
+  //       return res.end();
+  //     }
+  //   }
+  //   return res.end();
+  // } catch (error) {
+  //   console.log(error);
+  //   return res.json({ error: error });
+  // }
+  res.end();
 });
 
 //Webhook @Mailchimp - Purchased made on Eventbrite
@@ -165,7 +166,7 @@ app.post("/", async (req, res, next) => {
 
       const {
         data: { name, email, event_id },
-      } = response;
+      } = orderResponse;
 
       //Fetch Event Data
       const eventResponse = await axios.get(
