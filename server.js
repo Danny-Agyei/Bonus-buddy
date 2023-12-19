@@ -61,8 +61,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/user", async (req, res) => {
   try {
-    await sendEmail("coderdanny2018@gmail.com", "markgee12@site.com");
-    return res.json({ success: true });
+    const email = "joe@promomasterclass.com";
+
+    const subscriber_hash = md5(email.toLowerCase());
+
+    const response = await mailchimp.lists.getListMember(
+      listId,
+      subscriber_hash
+    );
+
+    return res.json({ data: response });
   } catch (error) {
     console.log(error.message);
     return res.json({ error: error });
@@ -123,67 +131,69 @@ app.post("/webhook", async (req, res) => {
 
 //Handle webhook request
 app.post("/", async (req, res, next) => {
-  const { type, data } = req.body;
+  const data = await req.body;
+  const reqBody = req.body;
 
-  const refereeEmail = data.email;
+  // const refereeEmail = data.email;
 
   console.log("MAIN WEBHOOK =>", data);
+  console.log("Eventbrite =>", reqBody);
 
-  if (type !== "subscribe") {
-    console.log("Not subscribe");
-    console.log(type, data);
-    return res.end();
-  } else {
-    try {
-      //Find the referral
-      const foundUser = await Hub.findOneAndUpdate({
-        referrals: { $in: [refereeEmail] },
-      });
+  // if (type !== "subscribe") {
+  //   console.log("Not subscribe");
+  //   console.log(type, data);
+  //   return res.end();
+  // } else {
+  //   try {
+  //     //Find the referral
+  //     const foundUser = await Hub.findOneAndUpdate({
+  //       referrals: { $in: [refereeEmail] },
+  //     });
 
-      if (foundUser) {
-        console.log(foundUser.email);
+  //     if (foundUser) {
+  //       console.log(foundUser.email);
 
-        //Get referral data from Mailchimp
-        const referralEmail = md5(foundUser.email.toLowerCase());
+  //       //Get referral data from Mailchimp
+  //       const referralEmail = md5(foundUser.email.toLowerCase());
 
-        const referralInfo = await mailchimp.lists.getListMember(
-          listId,
-          referralEmail
-        );
+  //       const referralInfo = await mailchimp.lists.getListMember(
+  //         listId,
+  //         referralEmail
+  //       );
 
-        //Update referral in MongoDB
-        const updatedUser = await Hub.findOneAndUpdate(
-          {
-            email: foundUser.email,
-          },
-          { $set: { refCount: foundUser.refCount + 1 } },
-          { new: true }
-        );
+  //       //Update referral in MongoDB
+  //       const updatedUser = await Hub.findOneAndUpdate(
+  //         {
+  //           email: foundUser.email,
+  //         },
+  //         { $set: { refCount: foundUser.refCount + 1 } },
+  //         { new: true }
+  //       );
 
-        //Update referral in Mailchimp
-        const subscriber_hash = md5(foundUser.email.toLowerCase());
+  //       //Update referral in Mailchimp
+  //       const subscriber_hash = md5(foundUser.email.toLowerCase());
 
-        const updateResponse = await mailchimp.lists.updateListMember(
-          listId,
-          subscriber_hash,
-          {
-            merge_fields: {
-              REFCOUNT: updatedUser.refCount,
-              REFS: referralInfo.merge_fields.REFS + refereeEmail + "|",
-            },
-          }
-        );
+  //       const updateResponse = await mailchimp.lists.updateListMember(
+  //         listId,
+  //         subscriber_hash,
+  //         {
+  //           merge_fields: {
+  //             REFCOUNT: updatedUser.refCount,
+  //             REFS: referralInfo.merge_fields.REFS + refereeEmail + "|",
+  //           },
+  //         }
+  //       );
 
-        return res.end();
-      } else {
-        console.log("User not found");
-        return res.end();
-      }
-    } catch (error) {
-      console.log(error.message);
-      res.end();
-    }
-  }
+  //       return res.end();
+  //     } else {
+  //       console.log("User not found");
+  //       return res.end();
+  //     }
+  //   } catch (error) {
+  //     console.log(error.message);
+  //     res.end();
+  //   }
+  // }
 });
 
 app.post("/refer", async (req, res) => {
