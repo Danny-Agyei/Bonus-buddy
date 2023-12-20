@@ -162,9 +162,11 @@ app.post("/", async (req, res, next) => {
           eventName,
           res
         );
+        // res.sendStatus(200);
       }
+    } else {
+      res.sendStatus(500);
     }
-    res.sendStatus(500);
   } catch (error) {
     console.log(error);
     return res.json({ error: error });

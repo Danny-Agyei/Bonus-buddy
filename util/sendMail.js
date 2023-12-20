@@ -169,23 +169,26 @@ export const sendEmail = async (referrer, invitee, eventName, res) => {
     },
   });
 
-  try {
-    // send mail with defined transport object
-    const info = await transporter.sendMail({
+  // send mail with defined transport object
+  await transporter.sendMail(
+    {
       from: '"Joe Cipriano" <info@merkadobarkada.com>', // sender address
       to: "dandesign96@gmail.com", // list of receivers
       //   to: "joe@joeciprianoconsulting.com,denise@promomasterclass.com", // list of receivers
       subject: "Urgent - Invitee just Enrolled!",
       text: "", // plain text body
       html: mailDescription, // html body
-    });
-
-    console.log("Message sent: %s", info.messageId);
-    transporter.close();
-    res.sendStatus(200);
-  } catch (error) {
-    console.log("Error sending mail...", error.message);
-    transporter.close();
-    res.sendStatus(500);
-  }
+    },
+    function (error, response) {
+      if (error) {
+        console.log(error);
+        console.log("Error sending mail...", error.message);
+        res.sendStatus(200);
+      } else {
+        console.log("Message sent: %s", response.message);
+        res.sendStatus(200);
+      }
+      transporter.close();
+    }
+  );
 };
