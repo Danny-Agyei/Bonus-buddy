@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 
-export const sendEmail = async (referrer, invitee, eventName) => {
+export const sendEmail = async (referrer, invitee, eventName, res) => {
   const mailDescription = `<!DOCTYPE html>
 
   <html lang="en" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml">
@@ -181,7 +181,11 @@ export const sendEmail = async (referrer, invitee, eventName) => {
     });
 
     console.log("Message sent: %s", info.messageId);
+    smtpTransport.close();
+    res.send(200);
   } catch (error) {
     console.log("Error sending mail...", error.message);
+    smtpTransport.close();
+    res.send(500);
   }
 };

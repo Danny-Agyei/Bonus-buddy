@@ -60,7 +60,30 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//Webhook @Mailchimp - Purchased made on Eventbrite
+// Eventbrite Redirect URL
+app.get("/user", async (req, res) => {
+  try {
+    const orderResponse = await axios.get(
+      "https://www.eventbriteapi.com/v3/orders/8559675729",
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.EVENT_PRIVATE_TOKEN}`,
+        },
+      }
+    );
+
+    const {
+      data: { name, email, event_id },
+    } = orderResponse;
+
+    res.json({ data: orderResponse.data });
+  } catch (error) {
+    console.log(error.message);
+    res.end();
+  }
+});
+
+// Eventbrite Redirect URL
 app.post("/webhook", async (req, res) => {
   const reqBody = await req.body;
 
@@ -133,14 +156,19 @@ app.post("/", async (req, res, next) => {
           },
         });
         console.log("EMAIL SENDING...");
-        await sendEmail(updatedUser.email, `${name} - ${email}`, eventName);
+        await sendEmail(
+          updatedUser.email,
+          `${name} - ${email}`,
+          eventName,
+          res
+        );
 
         //Clean up to prevent duplicates
         reqBody = {};
-        return res.end();
+        res.end();
       }
     }
-    return res.end();
+    return res.json({ success: false, status: 500 }).end();
   } catch (error) {
     console.log(error);
     return res.json({ error: error });
