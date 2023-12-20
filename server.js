@@ -120,7 +120,7 @@ app.post("/", async (req, res, next) => {
 
       //Find Referrer
       const foundReferrer = await Hub.findOne({
-        referrals: { $in: [email] },
+        "referrals.email": { $in: [email] },
       });
 
       //They were refer
