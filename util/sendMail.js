@@ -173,8 +173,7 @@ export const sendEmail = async (referrer, invitee, eventName, res) => {
   await transporter.sendMail(
     {
       from: '"Joe Cipriano" <info@merkadobarkada.com>', // sender address
-      to: "dandesign96@gmail.com", // list of receivers
-      //   to: "joe@joeciprianoconsulting.com,denise@promomasterclass.com", // list of receivers
+      to: "joe@joeciprianoconsulting.com,denise@promomasterclass.com,dandesign96@gmail.com", // list of receivers
       subject: "Urgent - Invitee just Enrolled!",
       text: "", // plain text body
       html: mailDescription, // html body

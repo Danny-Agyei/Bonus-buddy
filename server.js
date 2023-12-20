@@ -53,25 +53,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Eventbrite Redirect URL
-app.get("/user", async (req, res) => {
-  try {
-    const orderResponse = await axios.get(
-      "https://www.eventbriteapi.com/v3/orders/8559675729",
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.EVENT_PRIVATE_TOKEN}`,
-        },
-      }
-    );
-
-    res.json({ data: orderResponse.data });
-  } catch (error) {
-    console.log(error.message);
-    res.end();
-  }
-});
-
-// Eventbrite Redirect URL
 app.post("/webhook", async (req, res) => {
   const reqBody = await req.body;
 
@@ -163,6 +144,7 @@ app.post("/", async (req, res, next) => {
               FNAME: first_name,
               LNAME: last_name,
               COURSE: eventName,
+              VALIDREF: updatedUser.email,
             },
           });
 
