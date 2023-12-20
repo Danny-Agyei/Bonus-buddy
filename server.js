@@ -60,22 +60,6 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/user", async (req, res) => {
-  try {
-    const email = "dandesign96@gmail.com";
-    const subscriber_hash = md5(email.toLowerCase());
-    const response = await mailchimp.lists.getListMember(
-      listId,
-      subscriber_hash
-    );
-
-    return res.json({ data: response });
-  } catch (error) {
-    console.log(error.message);
-    return res.json({ error: error });
-  }
-});
-
 //Webhook @Mailchimp - Purchased made on Eventbrite
 app.post("/webhook", async (req, res) => {
   const reqBody = await req.body;
@@ -89,7 +73,7 @@ app.post("/webhook", async (req, res) => {
 //Handle webhook request
 app.post("/", async (req, res, next) => {
   try {
-    const reqBody = await req.body;
+    let reqBody = await req.body;
 
     const {
       config: { action },
@@ -150,10 +134,13 @@ app.post("/", async (req, res, next) => {
         });
         console.log("EMAIL SENDING...");
         await sendEmail(updatedUser.email, `${name} - ${email}`, eventName);
+
+        //Clean up to prevent duplicates
+        reqBody = {};
         return res.end();
       }
     }
-    res.end();
+    return res.end();
   } catch (error) {
     console.log(error);
     return res.json({ error: error });
