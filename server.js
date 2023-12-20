@@ -162,13 +162,9 @@ app.post("/", async (req, res, next) => {
           eventName,
           res
         );
-
-        //Clean up to prevent duplicates
-        // reqBody = {};
-        // res.end();
       }
     }
-    return res.json({ success: false, status: 500 }).end();
+    res.sendStatus(500);
   } catch (error) {
     console.log(error);
     return res.json({ error: error });
