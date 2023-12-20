@@ -181,11 +181,11 @@ export const sendEmail = async (referrer, invitee, eventName, res) => {
     });
 
     console.log("Message sent: %s", info.messageId);
-    smtpTransport.close();
+    transporter.close();
     res.send(200);
   } catch (error) {
     console.log("Error sending mail...", error.message);
-    smtpTransport.close();
+    transporter.close();
     res.send(500);
   }
 };
