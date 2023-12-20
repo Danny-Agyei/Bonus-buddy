@@ -145,26 +145,26 @@ app.post("/", async (req, res, next) => {
           );
 
           //Update referral in Mailchimp
-          //   const subscriber_hash = md5(updatedUser.email.toLowerCase());
+          const subscriber_hash = md5(updatedUser.email.toLowerCase());
 
-          //   await mailchimp.lists.updateListMember(listId, subscriber_hash, {
-          //     merge_fields: {
-          //       REFCOUNT: updatedUser.refCount,
-          //       REFS: email,
-          //     },
-          //   });
+          await mailchimp.lists.updateListMember(listId, subscriber_hash, {
+            merge_fields: {
+              REFCOUNT: updatedUser.refCount,
+              REFS: email,
+            },
+          });
 
           //Add or update invitee in Mailchimp
-          //   const invitee_hash = md5(email.toLowerCase());
-          //   await mailchimp.lists.setListMember(listId, invitee_hash, {
-          //     email_address: email,
-          //     status_if_new: "subscribed",
-          //     merge_fields: {
-          //       FNAME: first_name,
-          //       LNAME: last_name,
-          //       COURSE: eventName,
-          //     },
-          //   });
+          const invitee_hash = md5(email.toLowerCase());
+          await mailchimp.lists.setListMember(listId, invitee_hash, {
+            email_address: email,
+            status_if_new: "subscribed",
+            merge_fields: {
+              FNAME: first_name,
+              LNAME: last_name,
+              COURSE: eventName,
+            },
+          });
 
           console.log("EMAIL SENDING...");
           await sendEmail(
@@ -222,9 +222,9 @@ app.post("/refer", async (req, res) => {
           { new: true }
         );
 
-        // const response = await mailchimp.lists.batchListMembers(refListId, {
-        //   members,
-        // });
+        const response = await mailchimp.lists.batchListMembers(refListId, {
+          members,
+        });
 
         return res.json({ success: true, status: 200 });
       } else {
@@ -236,9 +236,9 @@ app.post("/refer", async (req, res) => {
 
         await userHub.save();
 
-        // const response = await mailchimp.lists.batchListMembers(refListId, {
-        //   members,
-        // });
+        const response = await mailchimp.lists.batchListMembers(refListId, {
+          members,
+        });
 
         return res.json({ success: true, status: 200 });
       }
