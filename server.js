@@ -164,8 +164,8 @@ app.post("/", async (req, res, next) => {
         );
 
         //Clean up to prevent duplicates
-        reqBody = {};
-        res.end();
+        // reqBody = {};
+        // res.end();
       }
     }
     return res.json({ success: false, status: 500 }).end();
