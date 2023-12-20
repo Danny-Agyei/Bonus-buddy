@@ -185,7 +185,7 @@ export const sendEmail = async (referrer, invitee, eventName, res) => {
         console.log("Error sending mail...", error.message);
         res.sendStatus(200);
       } else {
-        console.log("Message sent: %s", response.message);
+        console.log("Message sent: %s", response.messageId);
         res.sendStatus(200);
       }
       transporter.close();

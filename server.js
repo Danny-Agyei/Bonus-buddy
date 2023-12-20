@@ -1,15 +1,8 @@
 import express, { json } from "express";
 import dotenv from "dotenv";
-import colors from "colors";
 import morgan from "morgan";
-import voucher_codes from "voucher-code-generator";
-import path from "path";
-import async from "async";
-import jwt from "jsonwebtoken";
 import mailchimp from "@mailchimp/mailchimp_marketing";
 import md5 from "md5";
-import nodemailer from "nodemailer";
-import asyncHandler from "express-async-handler";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from "cors";
@@ -17,7 +10,6 @@ import cors from "cors";
 const app = express();
 
 //Models & DBs
-import User from "./models/user.js";
 import Hub from "./models/hub.js";
 import axios from "axios";
 import { sendEmail } from "./util/sendMail.js";
@@ -72,10 +64,6 @@ app.get("/user", async (req, res) => {
       }
     );
 
-    const {
-      data: { name, email, event_id },
-    } = orderResponse;
-
     res.json({ data: orderResponse.data });
   } catch (error) {
     console.log(error.message);
@@ -114,7 +102,7 @@ app.post("/", async (req, res, next) => {
       });
 
       const {
-        data: { name, email, event_id },
+        data: { name, first_name, last_name, email, event_id },
       } = orderResponse;
 
       //Fetch Event Data
@@ -137,32 +125,57 @@ app.post("/", async (req, res, next) => {
 
       //They were refer
       if (foundReferrer) {
-        //Update referral
-        const updatedUser = await Hub.findOneAndUpdate(
-          {
-            email: foundReferrer.email,
-          },
-          { $set: { refCount: foundReferrer.refCount + 1 } },
-          { new: true }
-        );
+        const invitee = foundReferrer.referrals.find((r) => r.email === email);
 
-        //Update referral in Mailchimp
-        const subscriber_hash = md5(updatedUser.email.toLowerCase());
+        //Check if invitee has already purchased
+        if (!invitee.hasPurchase) {
+          //Update referral
+          const updatedUser = await Hub.findOneAndUpdate(
+            {
+              email: foundReferrer.email,
+              "referrals.email": email,
+            },
+            {
+              $set: {
+                "referrals.$.hasPurchase": true,
+                refCount: foundReferrer.refCount + 1,
+              },
+            },
+            { new: true }
+          );
 
-        await mailchimp.lists.updateListMember(listId, subscriber_hash, {
-          merge_fields: {
-            REFCOUNT: updatedUser.refCount,
-            REFS: email,
-          },
-        });
-        console.log("EMAIL SENDING...");
-        await sendEmail(
-          updatedUser.email,
-          `${name} - ${email}`,
-          eventName,
-          res
-        );
-        // res.sendStatus(200);
+          //Update referral in Mailchimp
+          //   const subscriber_hash = md5(updatedUser.email.toLowerCase());
+
+          //   await mailchimp.lists.updateListMember(listId, subscriber_hash, {
+          //     merge_fields: {
+          //       REFCOUNT: updatedUser.refCount,
+          //       REFS: email,
+          //     },
+          //   });
+
+          //Add or update invitee in Mailchimp
+          //   const invitee_hash = md5(email.toLowerCase());
+          //   await mailchimp.lists.setListMember(listId, invitee_hash, {
+          //     email_address: email,
+          //     status_if_new: "subscribed",
+          //     merge_fields: {
+          //       FNAME: first_name,
+          //       LNAME: last_name,
+          //       COURSE: eventName,
+          //     },
+          //   });
+
+          console.log("EMAIL SENDING...");
+          await sendEmail(
+            updatedUser.email,
+            `${name} - ${email}`,
+            eventName,
+            res
+          );
+        } else {
+          res.sendStatus(500);
+        }
       }
     } else {
       res.sendStatus(500);
@@ -180,6 +193,7 @@ app.post("/refer", async (req, res) => {
     try {
       const foundUser = await Hub.findOne({ email: username });
 
+      //members to mailchimp
       const members = referees.map((ref) => ({
         email_address: ref,
         status: "subscribed",
@@ -188,8 +202,14 @@ app.post("/refer", async (req, res) => {
         },
       }));
 
+      //members to db
+      const dbMembers = referees.map((ref) => ({
+        email: ref,
+        hasPurchase: false,
+      }));
+
       if (foundUser) {
-        const updatedReferrals = referees.concat(foundUser.referrals);
+        const updatedReferrals = dbMembers.concat(foundUser.referrals);
 
         const updatedUser = await Hub.findOneAndUpdate(
           { _id: foundUser._id },
@@ -202,25 +222,23 @@ app.post("/refer", async (req, res) => {
           { new: true }
         );
 
-        const response = await mailchimp.lists.batchListMembers(refListId, {
-          members,
-        });
-        console.log(response);
+        // const response = await mailchimp.lists.batchListMembers(refListId, {
+        //   members,
+        // });
 
         return res.json({ success: true, status: 200 });
       } else {
         const userHub = new Hub({
           email: username,
           refCount: 0,
-          referrals: referees,
+          referrals: dbMembers,
         });
 
         await userHub.save();
 
-        const response = await mailchimp.lists.batchListMembers(refListId, {
-          members,
-        });
-        console.log(response);
+        // const response = await mailchimp.lists.batchListMembers(refListId, {
+        //   members,
+        // });
 
         return res.json({ success: true, status: 200 });
       }

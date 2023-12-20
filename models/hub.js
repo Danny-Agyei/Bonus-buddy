@@ -11,7 +11,12 @@ const hubSchema = new Schema({
   refCount: {
     type: Number,
   },
-  referrals: [],
+  referrals: [
+    {
+      email: { type: String },
+      hasPurchase: { type: Boolean },
+    },
+  ],
 });
 
 export default mongoose.model("Hub", hubSchema);
