@@ -32,7 +32,6 @@ mailchimp.setConfig({
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI);
-    // console.log(process.env.MONGO_URI);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.log(error);
@@ -52,7 +51,6 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Eventbrite Redirect URL
 app.post("/webhook", async (req, res) => {
   const reqBody = await req.body;
 
@@ -87,17 +85,17 @@ app.post("/", async (req, res, next) => {
       } = orderResponse;
 
       //Fetch Event Data
-      const eventResponse = await axios.get(
-        `https://www.eventbriteapi.com/v3/events/${event_id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.EVENT_PRIVATE_TOKEN}`,
-          },
-        }
-      );
+      // const eventResponse = await axios.get(
+      //   `https://www.eventbriteapi.com/v3/events/${event_id}`,
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${process.env.EVENT_PRIVATE_TOKEN}`,
+      //     },
+      //   }
+      // );
 
       //Get Event Name
-      const eventName = eventResponse.data.name.text;
+      // const eventName = eventResponse.data.name.text;
 
       //Find Referrer
       const foundReferrer = await Hub.findOne({
@@ -143,18 +141,12 @@ app.post("/", async (req, res, next) => {
             merge_fields: {
               FNAME: first_name,
               LNAME: last_name,
-              COURSE: eventName,
               VALIDREF: updatedUser.email,
             },
           });
 
           console.log("EMAIL SENDING...");
-          await sendEmail(
-            updatedUser.email,
-            `${name} - ${email}`,
-            eventName,
-            res
-          );
+          await sendEmail(updatedUser.email, `${name} - ${email}`, res);
         } else {
           res.sendStatus(500);
         }
@@ -178,10 +170,11 @@ app.post("/refer", async (req, res) => {
       //members to mailchimp
       const members = referees.map((ref) => ({
         email_address: ref,
-        status: "subscribed",
+        status_if_new: "subscribed",
         merge_fields: {
           REFERBY: username,
         },
+        tags: ["referred"],
       }));
 
       //members to db
@@ -193,7 +186,7 @@ app.post("/refer", async (req, res) => {
       if (foundUser) {
         const updatedReferrals = dbMembers.concat(foundUser.referrals);
 
-        const updatedUser = await Hub.findOneAndUpdate(
+        await Hub.findOneAndUpdate(
           { _id: foundUser._id },
 
           {
@@ -204,8 +197,9 @@ app.post("/refer", async (req, res) => {
           { new: true }
         );
 
-        const response = await mailchimp.lists.batchListMembers(refListId, {
+        await mailchimp.lists.batchListMembers(refListId, {
           members,
+          update_existing: true,
         });
 
         return res.json({ success: true, status: 200 });
@@ -218,8 +212,9 @@ app.post("/refer", async (req, res) => {
 
         await userHub.save();
 
-        const response = await mailchimp.lists.batchListMembers(refListId, {
+        await mailchimp.lists.batchListMembers(refListId, {
           members,
+          update_existing: true,
         });
 
         return res.json({ success: true, status: 200 });
@@ -392,7 +387,6 @@ $(document).ready(function() {
 	const userEmail = getQueryParameter('user');
 
 	userEmail && localStorage.setItem('userEmail',userEmail);
-	console.log(userEmail);
 	
 	
 		$('#form').submit(function(e) {
@@ -401,7 +395,6 @@ $(document).ready(function() {
 			let email = $('.email').val();
 
 			const ref = localStorage.getItem('userEmail');
-			console.log('user from storage',ref);
 
 
 			const referees = email.split(',');

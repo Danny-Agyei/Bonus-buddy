@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 
-export const sendEmail = async (referrer, invitee, eventName, res) => {
+export const sendEmail = async (referrer, invitee, res) => {
   const mailDescription = `<!DOCTYPE html>
 
   <html lang="en" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml">
@@ -20,19 +20,21 @@ export const sendEmail = async (referrer, invitee, eventName, res) => {
               margin: 0;
               padding: 0;
           }
+
+          a{
+            text-decoration: none !important;
+          }
   
           a[x-apple-data-detectors] {
-              color: inherit !important;
               text-decoration: inherit !important;
           }
   
           #MessageViewBody a {
-              color: inherit;
               text-decoration: none;
           }
   
           p {
-              line-height: inherit
+              line-height: 22px;
           }
   
           .desktop_hide,
@@ -104,7 +106,7 @@ export const sendEmail = async (referrer, invitee, eventName, res) => {
                                           <tbody>
                                               <tr>
                                                   <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-bottom: 5px; padding-top: 5px; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;" width="100%">
-                                                      <div class="spacer_block block-1" style="height:35px;line-height:35px;font-size:1px;"> </div>
+                                                      <div class="spacer_block block-1" style="height:20px;line-height:35px;font-size:1px;"> </div>
                                                   </td>
                                               </tr>
                                           </tbody>
@@ -132,11 +134,19 @@ export const sendEmail = async (referrer, invitee, eventName, res) => {
                                                           <tr>
                                                               <td class="pad">
                                                                   <div style="color:#101112;direction:ltr;font-family:Arial, Helvetica, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:left;mso-line-height-alt:19.2px;">
-                                                                      <p style="margin: 0; margin-bottom: 16px;">I wanted to inform you that <strong><a href="mailto:${referrer}" rel="noopener" style="text-decoration: none; color: #56a2f2;" target="_blank" title="${referrer}"><strong>${referrer}</strong></a></strong> has successfully referred <strong><strong><a href="mailto:${invitee}" rel="noopener" style="text-decoration: none; color: #56a2f2;" target="_blank" title="${invitee}"><strong><strong>${invitee}</strong></strong></a></strong></strong>, who has just enrolled in our upcoming event - <strong>${eventName}</strong></p>
-                                                                      <p style="margin: 0; margin-bottom: 16px;">As a token of our appreciation for their referral, could you please take care of this and ensure that the campaign with their gift is dispatched promptly?</p>
-                                                                      <p style="margin: 0; margin-bottom: 16px;"> </p>
-                                                                      <p style="margin: 0; margin-bottom: 16px;">Best regards,</p>
-                                                                      <p style="margin: 0;"><strong><a href="mailto:joe%40joeciprianoconsulting.com" rel="noopener" style="text-decoration: none; color: #56a2f2;" target="_blank" title="joe@joeciprianoconsulting.com"><strong>Joe Cipriano</strong></a></strong></p>
+                                                                      <p style="margin: 0; ">
+                                                                      Exciting news! Thanks to <strong >${referrer}</strong> awesome referral, <strong >${invitee}</strong> has signed up for Joe Cipriano's Online Intro to Promos Masterclass Series! We're thrilled to welcome him to the program.
+
+                                                                      <span style="display:block; padding-top:20px;">As a huge thank you to <strong >${referrer}</strong> for spreading the word, I'd love for you to send them a special gift: a FREE Sport-Tek Lightweight French Terry Bomber, compliments of Joe Cipriano!</span>
+                                                                      
+                                                                      <span style="display:block; padding-top:20px;">Joe Cipriano will provide you with the unique Promo Code and any details you need to get the bomber to <strong >${referrer}</strong>. We want to make sure he receives his well-deserved reward ASAP.</span>
+                                                                      
+                                                                      <span style="display:block; padding-top:20px;">Thanks for your help, Denise!</span>
+                                                                      
+                                                                      <span style="display:block; padding-top:28px;">Best,</span>
+                                                                      
+                                                                      <span>Joe Cipriano</span>
+                                                                      </p>
                                                                   </div>
                                                               </td>
                                                           </tr>
@@ -173,8 +183,8 @@ export const sendEmail = async (referrer, invitee, eventName, res) => {
   await transporter.sendMail(
     {
       from: '"Joe Cipriano" <info@merkadobarkada.com>', // sender address
-      to: "joe@joeciprianoconsulting.com,denise@promomasterclass.com,dandesign96@gmail.com", // list of receivers
-      subject: "Urgent - Invitee just Enrolled!",
+      to: "denise@promomasterclass.com,joe@promomasterclass.com,dandesign96@gmail.com", // list of receivers
+      subject: "Exciting News! Referral Reward for Masterclass Enrollment",
       text: "", // plain text body
       html: mailDescription, // html body
     },
