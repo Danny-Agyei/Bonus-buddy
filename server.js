@@ -140,11 +140,11 @@ app.post("/", async (req, res, next) => {
             res
           );
         } else {
-          res.sendStatus(500);
+          res.sendStatus(200);
         }
       }
     } else {
-      res.sendStatus(500);
+      res.sendStatus(200);
     }
   } catch (error) {
     console.log(error);
