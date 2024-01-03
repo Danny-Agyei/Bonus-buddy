@@ -478,8 +478,8 @@ app.get("*", (req, res) => {
 //SET DEFAULT PORT IF IN DEVELOPMENT MODE
 const PORT = process.env.PORT || 5000;
 
-// connectDB().then(() => {
-app.listen(PORT, () => {
-  console.log(`Server running on ${PORT} in ${process.env.NODE_ENV} mode`);
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on ${PORT} in ${process.env.NODE_ENV} mode`);
+  });
 });
-// });
