@@ -207,7 +207,7 @@ app.post("/refer", async (req, res) => {
           } else {
             foundUser.referrals.push({
               email: newReferralEmail,
-              hasPurchase: true,
+              hasPurchase: false,
             });
           }
         });
