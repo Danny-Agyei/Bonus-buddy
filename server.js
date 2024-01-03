@@ -51,13 +51,34 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post("/webhook", async (req, res) => {
-  const reqBody = await req.body;
+app.get("/test", async (req, res) => {
+  const eventResponse = await axios.get(
+    `https://www.eventbriteapi.com/v3/events/780358261567/attendees/14128066889`,
+    {
+      headers: {
+        Authorization: `Bearer ILM7T56WBLOTFUDAQCQW`,
+      },
+    }
+  );
 
-  console.log("INCOMING REQUEST FROM MAILCHIMP =>");
-  console.log(reqBody);
+  const {
+    data: {
+      profile: { name, first_name, last_name, email },
+      ticket_class_name,
+      order_id,
+      event_id,
+    },
+  } = eventResponse;
 
-  res.end();
+  res.json({
+    name,
+    email,
+    ticket_class_name,
+    first_name,
+    last_name,
+    order_id,
+    event_id,
+  });
 });
 
 //Handle webhook request
@@ -70,32 +91,26 @@ app.post("/", async (req, res, next) => {
       api_url,
     } = reqBody;
 
-    if (action.toLowerCase() === "order.placed") {
+    if (action.toLowerCase() === "attendee.updated") {
       //Fetch Order Data
       console.log("ACTION =>", action);
 
-      const orderResponse = await axios.get(api_url, {
+      const attendeeResponse = await axios.get(api_url, {
         headers: {
           Authorization: `Bearer ${process.env.EVENT_PRIVATE_TOKEN}`,
         },
       });
 
       const {
-        data: { name, first_name, last_name, email, event_id },
-      } = orderResponse;
+        data: {
+          profile: { name, first_name, last_name, email },
+          ticket_class_name,
+          order_id,
+          event_id,
+        },
+      } = attendeeResponse;
 
-      //Fetch Event Data
-      // const eventResponse = await axios.get(
-      //   `https://www.eventbriteapi.com/v3/events/${event_id}`,
-      //   {
-      //     headers: {
-      //       Authorization: `Bearer ${process.env.EVENT_PRIVATE_TOKEN}`,
-      //     },
-      //   }
-      // );
-
-      //Get Event Name
-      // const eventName = eventResponse.data.name.text;
+      console.log(name, first_name, last_name, email, ticket_class_name);
 
       //Find Referrer
       const foundReferrer = await Hub.findOne({
@@ -135,6 +150,7 @@ app.post("/", async (req, res, next) => {
 
           //Add or update invitee in Mailchimp
           const invitee_hash = md5(email.toLowerCase());
+
           await mailchimp.lists.setListMember(listId, invitee_hash, {
             email_address: email,
             status_if_new: "subscribed",
@@ -146,7 +162,13 @@ app.post("/", async (req, res, next) => {
           });
 
           console.log("EMAIL SENDING...");
-          await sendEmail(updatedUser.email, `${name} - ${email}`, res);
+
+          await sendEmail(
+            updatedUser.email,
+            `${name} - ${email}`,
+            ticket_class_name,
+            res
+          );
         } else {
           res.sendStatus(500);
         }
