@@ -51,6 +51,36 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.get("/test", async (req, res) => {
+  const eventResponse = await axios.get(
+    `https://www.eventbriteapi.com/v3/events/780358261567/attendees/14128066889`,
+    {
+      headers: {
+        Authorization: `Bearer ILM7T56WBLOTFUDAQCQW`,
+      },
+    }
+  );
+
+  const {
+    data: {
+      profile: { name, first_name, last_name, email },
+      ticket_class_name,
+      order_id,
+      event_id,
+    },
+  } = eventResponse;
+
+  res.json({
+    name,
+    email,
+    ticket_class_name,
+    first_name,
+    last_name,
+    order_id,
+    event_id,
+  });
+});
+
 //Handle webhook request
 app.post("/", async (req, res, next) => {
   try {
@@ -222,205 +252,223 @@ app.post("/refer", async (req, res) => {
 
 app.get("/refer", (req, res) => {
   const htmlForm = `
-<main style="height: 100%; position: relative; background-color: transparent !important; padding-top: 40px;">
+  <main style="height: 100%; position: relative; background-color: transparent !important; padding-top: 40px;">
 
-<div style="height: 100%; background-color: transparent !important;">
+  <div style="height: 100%; background-color: transparent !important;">
 
-	<style>
-	@import url('https://fonts.googleapis.com/css2?family=Raleway&family=Roboto:wght@400;500;700;900&display=swap');
-		html,
-		body {
-			background-color: transparent !important;
-			font-family: 'Roboto', 'Arial', sans-serif;
-		}
+      <style>
+          @import url('https://fonts.googleapis.com/css2?family=Raleway&family=Roboto:wght@400;500;700;900&display=swap');
 
-		input:focus {
-			outline: none;
-		}
+          html,
+          body {
+              background-color: transparent !important;
+              font-family: 'Roboto', 'Arial', sans-serif;
+          }
 
-		p {
-			color: #ffffff;
-			font-size: 14.5px;
-			line-height: 1.4em;
-			margin-bottom: 20px;
-		}
+          input:focus {
+              outline: none;
+          }
 
-		::-webkit-input-placeholder {
-			color: rgb(167, 167, 167);
-		}
+          p {
+              color: #ffffff;
+              font-size: 14.5px;
+              line-height: 1.4em;
+              margin-bottom: 20px;
+          }
 
-		:-ms-input-placeholder {
-			color: rgb(167, 167, 167);
-		}
+          ::-webkit-input-placeholder {
+              color: rgb(167, 167, 167);
+          }
 
-		::-ms-input-placeholder {
-			color: rgb(167, 167, 167);
-		}
+          :-ms-input-placeholder {
+              color: rgb(167, 167, 167);
+          }
 
-		:-moz-placeholder {
-			color: rgb(167, 167, 167);
-		}
+          ::-ms-input-placeholder {
+              color: rgb(167, 167, 167);
+          }
 
-		::placeholder {
-			color: rgb(167, 167, 167);
-		}
+          :-moz-placeholder {
+              color: rgb(167, 167, 167);
+          }
 
-
-		@media only screen and (max-width: 680px) {
-			.main-container {
-				padding: 0 !important;
-			}
-
-			.wrapper {
-				padding: 0 5% !important;
-			}
-
-			.heading {
-				font-size: 26px !important;
-				padding: 0 10px;
-			}
-
-			.event {
-				width: 300px !important;
-			}
-
-		}
-
-		@media (min-width:360px) and (max-width:640px) {
-
-			.main-container {
-				padding: 30px 20px !important;
-				background-color: transparent !important;
-			}
-
-			.wrapper {
-				padding: 0 1% !important
-			}
-
-		}
-
-	</style>
-	<div style="display: flex; justify-content: center; padding-bottom: 20px; width: 100%; box-sizing: border-box;">
-		<form style="max-width: 100%; padding: 30px 10px; background:#8BA7BD;border-radius: 5px;" id='form'>
-			<div class="main-container" style="height: fit-content; width: 500px; background-color: transparent !important; padding:0 35px; max-width: 100%; box-sizing: border-box; margin: 0;">
-				<h1 style="color:#0E1F2F; font-size: 22px; line-height: 1.15em; margin-bottom: 20px; font-family: 'Roboto', 'Arial', sans-serif;">Refer a Friend and get a coupon for FREE Joe Cipriano Promo Masterclass Merch!</h1>
-				<p class="sub-title" style="font-family: 'Raleway', 'Roboto','Arial', sans-serif;  font-size:14.5px; line-height:1.4em;">Think you know a friend who would like to take either Joe’s “Intro to Promos” or “Promo Masterclass” online courses?</p>
-				<p class="des" style="font-weight: 400; font-size:14.5px; line-height:1.4em; color: #ffffff; font-family: 'Raleway', 'Roboto','Arial', sans-serif;">Your referral will save them up to $100 and when they enroll, you'll received a coupon for FREE merch.</p>
-				<p class="des" style="font-weight: 600; font-size:14.5px; line-height:1.4em; color: #ffffff; font-family: 'Raleway', 'Roboto','Arial', sans-serif; ">The more friends who sign up, the more free stuff you get!</p>
-
-				<div class="form-inline">
-					<div style="display: flex; position: relative;">
-						<div style="display: flex; flex-direction: column; padding: 0px;  position: relative; flex: 1 1 0%;">
-							<style>
-								* {
-									margin-block: unset;
-								}
-
-							</style>
-
-						</div>
-					</div>
-					<div class="wrapper" style="padding: 0 !important;">
-						<div style="display: flex; position: relative;">
-
-						</div>
-
-						<div style="position: relative;">
-							<div style=" padding: 10px 0px 0; background-color: rgba(255, 255, 255, 0); ">
-								<div style="display: flex; width: 100%; flex-direction: column;">
-									<div style="display: flex;">
-										<input required class="email" id="" placeholder="example1@gmail.com,example2@outlook.com" aria-required="true" style="color: rgb(0, 0, 0); font-family: 'Roboto', Arial; font-size: 16px; font-weight: 400; width: 100%; height: 55px; padding-left: 16px; border: 2px solid rgba(142, 142, 142, 0.3); border-radius: 3px; box-sizing: border-box;">
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-				</div>
-				<div class="wrapper" style="padding: 0 !important;">
-					<div class="message">
-						<div style="display: flex; flex-direction: column; padding: 10px 0 6px; background-color: rgba(255, 255, 255, 0); position: relative; flex: 1 1 0%;">
-							<button type="submit" class="submitBtn" style="font-family: 'Roboto', Arial, sans-serif; font-weight: 600; font-size: 18px;  color: rgb(255, 255, 255); background-color: #E81013; border-radius: 2px; border: 0px solid rgb(34, 34, 34); border-radius: 5px; height: 60px; width: 100%; padding: 0px; margin: 0px auto; cursor: pointer;">
-								<style>
-									button:hover {
-										background-color: #cb0b0d !important;
-									}
-
-								</style>
-								SUBMIT
-							</button>
-
-						</div>
-					</div>
-				</div>
-				</div>
-				<div class='success-msg' style="display:none; height: fit-content; width: 500px; background-color: transparent !important; padding:30px 35px; max-width: 100%; box-sizing: border-box; margin: 0;">
-						<h1 style="color:#0E1F2F;font-size: 26px;line-height: 1.15em;
-					margin-bottom: 10px; font-family: 'Roboto', 'Arial', sans-serif; text-align:center;">THANK YOU!</h1>
-					<p style="font-family: 'Raleway','Roboto', sans-serif; text-align: center;  font-size:16px; line-height:1.4em; color:#ffffff;">An email has been sent to your friend. If they enroll in one of our online courses with your discount code, you'll be sent your coupon code for FREE stuff.</p>
-				</div>
-		</form>
-	</div>
-</div>
+          ::placeholder {
+              color: rgb(167, 167, 167);
+          }
 
 
-<!-- core  -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js" integrity="sha512-pumBsjNRGGqkPzKHndZMaAG+bir374sORyzM3uulLV14lN5LyykqNk8eEeUlUkB3U0M4FApyaHraT65ihJhDpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+          @media only screen and (max-width: 680px) {
+              .main-container {
+                  padding: 0 !important;
+              }
+
+              .wrapper {
+                  padding: 0 5% !important;
+              }
+
+              .heading {
+                  font-size: 26px !important;
+                  padding: 0 10px;
+              }
+
+              .event {
+                  width: 300px !important;
+              }
+
+          }
+
+          @media (min-width:360px) and (max-width:640px) {
+
+              .main-container {
+                  padding: 30px 20px !important;
+                  background-color: transparent !important;
+              }
+
+              .wrapper {
+                  padding: 0 1% !important
+              }
+
+          }
+
+      </style>
+      <div style="display: flex; justify-content: center; padding-bottom: 20px; width: 100%; box-sizing: border-box;">
+          <form style="max-width: 100%; padding: 30px 10px; background:#8BA7BD;border-radius: 5px;" id='form'>
+              <div class="main-container" style="height: fit-content; width: 500px; background-color: transparent !important; padding:0 35px; max-width: 100%; box-sizing: border-box; margin: 0;">
+                  <h1 style="color:#0E1F2F; font-size: 22px; line-height: 1.15em; margin-bottom: 20px; font-family: 'Roboto', 'Arial', sans-serif;">Refer a Friend and get a coupon for FREE Joe Cipriano Promo Masterclass Merch!</h1>
+                  <p class="sub-title" style="font-family: 'Raleway', 'Roboto','Arial', sans-serif;  font-size:14.5px; line-height:1.4em;">Think you know a friend who would like to take either Joe’s “Intro to Promos” or “Promo Masterclass” online courses?</p>
+                  <p class="des" style="font-weight: 400; font-size:14.5px; line-height:1.4em; color: #ffffff; font-family: 'Raleway', 'Roboto','Arial', sans-serif;">Your referral will save them up to $100 and when they enroll, you'll received a coupon for FREE merch.</p>
+                  <p class="des" style="font-weight: 600; font-size:14.5px; line-height:1.4em; color: #ffffff; font-family: 'Raleway', 'Roboto','Arial', sans-serif; ">The more friends who sign up, the more free stuff you get!</p>
+
+                  <div class="form-inline">
+                      <div style="display: flex; position: relative;">
+                          <div style="display: flex; flex-direction: column; padding: 0px;  position: relative; flex: 1 1 0%;">
+                              <style>
+                                  * {
+                                      margin-block: unset;
+                                  }
+
+                              </style>
+
+                          </div>
+                      </div>
+                      <div class="wrapper" style="padding: 0 !important;">
+                          <div style="display: flex; position: relative;">
+
+                          </div>
+
+                          <div style="position: relative;">
+                              <div style=" padding: 10px 0px 0; background-color: rgba(255, 255, 255, 0); ">
+                                  <div style="display: flex; width: 100%; flex-direction: column;">
+                                      <div style="display: flex;">
+                                          <input required class="email" id="" placeholder="example1@gmail.com,example2@outlook.com" aria-required="true" style="color: rgb(0, 0, 0); font-family: 'Roboto', Arial; font-size: 16px; font-weight: 400; width: 100%; height: 55px; padding-left: 16px; border: 2px solid rgba(142, 142, 142, 0.3); border-radius: 3px; box-sizing: border-box;">
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+
+                  </div>
+                  <div class="wrapper" style="padding: 0 !important;">
+                      <div class="message">
+                          <div style="display: flex; flex-direction: column; padding: 10px 0 6px; background-color: rgba(255, 255, 255, 0); position: relative; flex: 1 1 0%;">
+                              <button type="submit" class="submitBtn" style="font-family: 'Roboto', Arial, sans-serif; font-weight: 600; font-size: 18px;  color: rgb(255, 255, 255); background-color: #E81013; border-radius: 2px; border: 0px solid rgb(34, 34, 34); border-radius: 5px; height: 60px; width: 100%; padding: 0px; margin: 0px auto; cursor: pointer;">
+                                  <style>
+                                      button:hover {
+                                          background-color: #cb0b0d !important;
+                                      }
+
+                                  </style>
+                                  SUBMIT
+                              </button>
+
+                          </div>
+                          <p class="error-msg" style="padding-top: 15px; display: none">
+                              <span style="color:red;">*</span> Oops! One or two emails entered are incorrect. Please check and try again
+                          </p>
+                      </div>
+                  </div>
+              </div>
+              <div class='success-msg' style="display:none; height: fit-content; width: 500px; background-color: transparent !important; padding:30px 35px; max-width: 100%; box-sizing: border-box; margin: 0;">
+                  <h1 style="color:#0E1F2F;font-size: 26px;line-height: 1.15em;
+    margin-bottom: 10px; font-family: 'Roboto', 'Arial', sans-serif; text-align:center;">THANK YOU!</h1>
+                  <p style="font-family: 'Raleway','Roboto', sans-serif; text-align: center;  font-size:16px; line-height:1.4em; color:#ffffff;">An email has been sent to your friend. If they enroll in one of our online courses with your discount code, you'll be sent your coupon code for FREE stuff.</p>
+              </div>
+          </form>
+      </div>
+  </div>
 
 
-<script type="text/javascript">
-$(document).ready(function() {
-
-	function getQueryParameter(name) {
-		const urlParams = new URLSearchParams(window.location.search);
-		return urlParams.get(name);
-	};
-
-	const userEmail = getQueryParameter('user');
-
-	userEmail && localStorage.setItem('userEmail',userEmail);
-	
-	
-		$('#form').submit(function(e) {
-			e.preventDefault();
-
-			let email = $('.email').val();
-
-			const ref = localStorage.getItem('userEmail');
+  <!-- core  -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js" integrity="sha512-pumBsjNRGGqkPzKHndZMaAG+bir374sORyzM3uulLV14lN5LyykqNk8eEeUlUkB3U0M4FApyaHraT65ihJhDpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 
-			const referees = email.split(',');
-			if(userEmail || ref){
-				$.ajax({
-					url: 'https://giant-pink-raincoat.cyclic.app/refer',
-					data: {
-						"username": userEmail || ref,
-						"referees": referees
-					},
-					type: "post",
-					dataType: "json",
-					success: function(json) {
-						if(json.success){
-							$('.main-container').hide();
-							$('.success-msg').show();
-						}else{
-							alert("Sorry, something went wrong!");
-						}
-						
-					},
-					error: function(jqXHR, textStatus, errorThrown) {
-						alert("Sorry, something went wrong!");
-					}
-				})
-			} else{
-				alert('Something went wrong, reload the page and try again!')
-			}
-				
-		})
+  <script type="text/javascript">
+      $(document).ready(function() {
 
-})
+          function getQueryParameter(name) {
+              const urlParams = new URLSearchParams(window.location.search);
+              return urlParams.get(name);
+          };
 
-</script></main>`;
+          const userEmail = getQueryParameter('user');
+
+          userEmail && localStorage.setItem('userEmail', userEmail);
+
+
+          $('#form').submit(function(e) {
+              e.preventDefault();
+
+              let errorMsg = $('.error-msg');
+
+              let email = $('.email').val();
+
+              let referees = email.split(',');
+
+              let foundError = referees.filter(email => {
+                  return !email.includes('@');
+              })
+
+              const ref = localStorage.getItem('userEmail');
+
+              if (foundError.length > 0) {
+                  errorMsg.show();
+              } else {
+                  if (userEmail || ref) {
+                       errorMsg.show();
+                      
+                      $.ajax({
+                          url: 'https://giant-pink-raincoat.cyclic.app/refer',
+                          data: {
+                              "username": userEmail || ref,
+                              "referees": referees
+                          },
+                          type: "post",
+                          dataType: "json",
+                          success: function(json) {
+                              if (json.success) {
+                                  $('.main-container').hide();
+                                  $('.success-msg').show();
+                              } else {
+                                  alert("Sorry, something went wrong!");
+                              }
+
+                          },
+                          error: function(jqXHR, textStatus, errorThrown) {
+                              alert("Sorry, something went wrong!");
+                          }
+                      })
+                  } else {
+                      alert('Something went wrong, reload the page and try again!')
+                  }
+              }
+
+
+          })
+
+      })
+
+  </script>
+</main>`;
 
   res.send(htmlForm);
 });
