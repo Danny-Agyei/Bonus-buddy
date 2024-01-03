@@ -51,36 +51,6 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/test", async (req, res) => {
-  const eventResponse = await axios.get(
-    `https://www.eventbriteapi.com/v3/events/780358261567/attendees/14128066889`,
-    {
-      headers: {
-        Authorization: `Bearer ILM7T56WBLOTFUDAQCQW`,
-      },
-    }
-  );
-
-  const {
-    data: {
-      profile: { name, first_name, last_name, email },
-      ticket_class_name,
-      order_id,
-      event_id,
-    },
-  } = eventResponse;
-
-  res.json({
-    name,
-    email,
-    ticket_class_name,
-    first_name,
-    last_name,
-    order_id,
-    event_id,
-  });
-});
-
 //Handle webhook request
 app.post("/", async (req, res, next) => {
   try {
