@@ -178,16 +178,22 @@ app.post("/refer", async (req, res) => {
       if (foundUser) {
         const updatedReferrals = dbMembers.concat(foundUser.referrals);
 
-        await Hub.findOneAndUpdate(
-          { _id: foundUser._id },
+        referees.forEach((newReferralEmail) => {
+          const existingReferral = foundUser.referrals.find(
+            (referral) => referral.email === newReferralEmail
+          );
 
-          {
-            $set: {
-              referrals: updatedReferrals,
-            },
-          },
-          { new: true }
-        );
+          if (existingReferral) {
+            existingReferral.hasPurchase = false;
+          } else {
+            foundUser.referrals.push({
+              email: newReferralEmail,
+              hasPurchase: true,
+            });
+          }
+        });
+
+        await foundUser.save();
 
         await mailchimp.lists.batchListMembers(refListId, {
           members,
