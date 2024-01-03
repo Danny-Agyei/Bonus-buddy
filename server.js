@@ -404,7 +404,7 @@ app.get("/refer", (req, res) => {
                   errorMsg.show();
               } else {
                   if (userEmail || ref) {
-                       errorMsg.show();
+                       errorMsg.hide();
                       
                       $.ajax({
                           url: 'https://giant-pink-raincoat.cyclic.app/refer',
