@@ -51,6 +51,27 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+//test
+app.get("/test", async (req, res) => {
+  const email = "dandesign96@gmail.com";
+
+  const subscriber_hash = md5(email.toLowerCase());
+
+  // await mailchimp.lists.updateListMemberTags(refListId, subscriber_hash, {
+  //   tags: [{ name: "referred", status: "inactive" }],
+  // });
+
+  // await mailchimp.lists.updateListMemberTags(refListId, subscriber_hash, {
+  //   tags: [{ name: "referred", status: "active" }],
+  // });
+
+  const response = await mailchimp.lists.getListMemberTags(
+    refListId,
+    subscriber_hash
+  );
+  res.json({ data: response });
+});
+
 //Handle webhook request
 app.post("/", async (req, res, next) => {
   try {
@@ -166,7 +187,7 @@ app.post("/refer", async (req, res) => {
         merge_fields: {
           REFERBY: username,
         },
-        tags: ["referred"],
+        tags: [{ name: "referred", status: "active" }],
       }));
 
       //members to db
@@ -176,8 +197,6 @@ app.post("/refer", async (req, res) => {
       }));
 
       if (foundUser) {
-        const updatedReferrals = dbMembers.concat(foundUser.referrals);
-
         referees.forEach((newReferralEmail) => {
           const existingReferral = foundUser.referrals.find(
             (referral) => referral.email === newReferralEmail
@@ -459,8 +478,8 @@ app.get("*", (req, res) => {
 //SET DEFAULT PORT IF IN DEVELOPMENT MODE
 const PORT = process.env.PORT || 5000;
 
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on ${PORT} in ${process.env.NODE_ENV} mode`);
-  });
+// connectDB().then(() => {
+app.listen(PORT, () => {
+  console.log(`Server running on ${PORT} in ${process.env.NODE_ENV} mode`);
 });
+// });
