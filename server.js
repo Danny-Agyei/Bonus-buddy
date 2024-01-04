@@ -49,7 +49,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 //test
 app.get("/test", async (req, res) => {
-  const email = "dr4lyf@gmail.com";
+  const email = "dandesign96@outloo.com";
 
   const subscriber_hash = md5(email.toLowerCase());
 
@@ -256,10 +256,10 @@ app.post("/refer", async (req, res) => {
 
         await userHub.save();
 
-        // await mailchimp.lists.batchListMembers(refListId, {
-        //   members,
-        //   update_existing: true,
-        // });
+        await mailchimp.lists.batchListMembers(refListId, {
+          members,
+          update_existing: true,
+        });
 
         async function processReferees(referees) {
           for (const ref of referees) {
