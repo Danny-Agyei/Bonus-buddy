@@ -49,7 +49,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 //test
 app.get("/test", async (req, res) => {
-  const email = "dandesign96@outloo.com";
+  const email = "dandesign96@outlook.com";
 
   const subscriber_hash = md5(email.toLowerCase());
 
@@ -216,6 +216,9 @@ app.post("/refer", async (req, res) => {
         //   members,
         //   update_existing: true,
         // });
+        await mailchimp.lists.batchListMembers(refListId, {
+          members,
+        });
 
         // start
 
@@ -224,22 +227,26 @@ app.post("/refer", async (req, res) => {
             const subscriber_hash = md5(ref.toLowerCase());
             console.log("ref =>", ref);
             // Delete tag if user is on list already
-            await mailchimp.lists.updateListMemberTags(
-              refListId,
-              subscriber_hash,
-              {
-                tags: [{ name: "referred", status: "inactive" }],
-              }
-            );
-
-            await mailchimp.lists.setListMember(refListId, subscriber_hash, {
+            // await mailchimp.lists.updateListMemberTags(
+            //   refListId,
+            //   subscriber_hash,
+            //   {
+            //     tags: [{ name: "referred", status: "inactive" }],
+            //   }
+            // );
+            await mailchimp.lists.updateListMember(refListId, subscriber_hash, {
               email_address: ref,
-              status_if_new: "subscribed",
-              merge_fields: {
-                REFERBY: username,
-              },
               tags: ["referred"],
             });
+
+            // await mailchimp.lists.setListMember(refListId, subscriber_hash, {
+            //   email_address: ref,
+            //   status_if_new: "subscribed",
+            //   merge_fields: {
+            //     REFERBY: username,
+            //   },
+            //   tags: ["referred"],
+            // });
           }
         }
 
