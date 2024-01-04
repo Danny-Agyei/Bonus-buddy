@@ -185,7 +185,7 @@ app.post("/refer", async (req, res) => {
         merge_fields: {
           REFERBY: username,
         },
-        tags: [{ name: "referred", status: "active" }],
+        tags: ["referred"],
       }));
 
       //members to db
@@ -256,10 +256,38 @@ app.post("/refer", async (req, res) => {
 
         await userHub.save();
 
-        await mailchimp.lists.batchListMembers(refListId, {
-          members,
-          update_existing: true,
-        });
+        // await mailchimp.lists.batchListMembers(refListId, {
+        //   members,
+        //   update_existing: true,
+        // });
+
+        async function processReferees(referees) {
+          for (const ref of referees) {
+            const subscriber_hash = md5(ref.toLowerCase());
+            console.log("ref =>", ref);
+            // Delete tag if user is on list already
+            await mailchimp.lists.updateListMemberTags(
+              refListId,
+              subscriber_hash,
+              {
+                tags: [{ name: "referred", status: "inactive" }],
+              }
+            );
+
+            await mailchimp.lists.setListMember(refListId, subscriber_hash, {
+              email_address: ref,
+              status_if_new: "subscribed",
+              merge_fields: {
+                REFERBY: username,
+              },
+              tags: ["referred"],
+            });
+          }
+        }
+
+        await processReferees(referees);
+
+        //  end
 
         return res.json({ success: true, status: 200 });
       }
@@ -459,7 +487,7 @@ app.get("/refer", (req, res) => {
                        errorMsg.hide();
                       
                       $.ajax({
-                          url: 'https://giant-pink-raincoat.cyclic.app/refer',
+                          url: 'http://localhost:3000/refer',
                           data: {
                               "username": userEmail || ref,
                               "referees": referees
