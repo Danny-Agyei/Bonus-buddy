@@ -39,10 +39,6 @@ const connectDB = async () => {
   }
 };
 
-//Initial variables
-let today = new Date();
-let seconds = today.getSeconds();
-
 //MIDDLEWARES
 app.use(morgan("dev"));
 app.use(cors());
@@ -53,7 +49,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 //test
 app.get("/test", async (req, res) => {
-  const email = "dandesign96@gmail.com";
+  const email = "dr4lyf@gmail.com";
 
   const subscriber_hash = md5(email.toLowerCase());
 
@@ -91,6 +87,8 @@ app.post("/", async (req, res, next) => {
           Authorization: `Bearer ${process.env.EVENT_PRIVATE_TOKEN}`,
         },
       });
+
+      console.log("ATTANDEE RESPONSE =>", attendeeResponse.data);
 
       const {
         data: {
@@ -214,11 +212,40 @@ app.post("/refer", async (req, res) => {
 
         await foundUser.save();
 
-        await mailchimp.lists.batchListMembers(refListId, {
-          members,
-          update_existing: true,
-        });
+        // await mailchimp.lists.batchListMembers(refListId, {
+        //   members,
+        //   update_existing: true,
+        // });
 
+        // start
+
+        async function processReferees(referees) {
+          for (const ref of referees) {
+            const subscriber_hash = md5(ref.toLowerCase());
+            console.log("ref =>", ref);
+            // Delete tag if user is on list already
+            await mailchimp.lists.updateListMemberTags(
+              refListId,
+              subscriber_hash,
+              {
+                tags: [{ name: "referred", status: "inactive" }],
+              }
+            );
+
+            await mailchimp.lists.setListMember(refListId, subscriber_hash, {
+              email_address: ref,
+              status_if_new: "subscribed",
+              merge_fields: {
+                REFERBY: username,
+              },
+              tags: ["referred"],
+            });
+          }
+        }
+
+        await processReferees(referees);
+
+        //  end
         return res.json({ success: true, status: 200 });
       } else {
         const userHub = new Hub({
