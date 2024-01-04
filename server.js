@@ -227,13 +227,14 @@ app.post("/refer", async (req, res) => {
             const subscriber_hash = md5(ref.toLowerCase());
             console.log("ref =>", ref);
             // Delete tag if user is on list already
-            // await mailchimp.lists.updateListMemberTags(
-            //   refListId,
-            //   subscriber_hash,
-            //   {
-            //     tags: [{ name: "referred", status: "inactive" }],
-            //   }
-            // );
+            await mailchimp.lists.updateListMemberTags(
+              refListId,
+              subscriber_hash,
+              {
+                tags: [{ name: "referred", status: "inactive" }],
+              }
+            );
+
             await mailchimp.lists.updateListMember(refListId, subscriber_hash, {
               email_address: ref,
               tags: ["referred"],
