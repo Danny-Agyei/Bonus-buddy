@@ -487,7 +487,7 @@ app.get("/refer", (req, res) => {
                        errorMsg.hide();
                       
                       $.ajax({
-                          url: 'http://localhost:3000/refer',
+                          url: 'https://giant-pink-raincoat.cyclic.app/refer',
                           data: {
                               "username": userEmail || ref,
                               "referees": referees
