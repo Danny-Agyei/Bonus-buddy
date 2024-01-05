@@ -47,20 +47,6 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//test
-app.get("/test", async (req, res) => {
-  const email = "dandesign96@gmail.com";
-
-  const subscriber_hash = md5(email.toLowerCase());
-
-  const response = await mailchimp.lists.getListMember(
-    refListId,
-    subscriber_hash
-  );
-
-  res.json({ response });
-});
-
 //Handle webhook request
 app.post("/", async (req, res, next) => {
   try {
@@ -81,14 +67,10 @@ app.post("/", async (req, res, next) => {
         },
       });
 
-      console.log("ATTANDEE RESPONSE =>", attendeeResponse.data);
-
       const {
         data: {
           profile: { name, first_name, last_name, email },
           ticket_class_name,
-          order_id,
-          event_id,
         },
       } = attendeeResponse;
 
