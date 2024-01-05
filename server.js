@@ -155,7 +155,7 @@ app.post("/refer", async (req, res) => {
 
       //members to mailchimp
       const members = referees.map((ref) => ({
-        email_address: ref,
+        email_address: ref.trim(),
         status_if_new: "subscribed",
         merge_fields: {
           REFERBY: username,
@@ -165,7 +165,7 @@ app.post("/refer", async (req, res) => {
 
       //members to db
       const dbMembers = referees.map((ref) => ({
-        email: ref,
+        email: ref.trim(),
         hasPurchase: false,
       }));
 
@@ -196,11 +196,11 @@ app.post("/refer", async (req, res) => {
 
         async function processReferees(referees) {
           for (const ref of referees) {
-            const subscriber_hash = md5(ref.toLowerCase());
+            const subscriber_hash = md5(ref.toLowerCase().trim());
             console.log("ref =>", ref);
 
             await mailchimp.lists.setListMember(refListId, subscriber_hash, {
-              email_address: ref,
+              email_address: ref.trim(),
               status_if_new: "subscribed",
               merge_fields: {
                 REFERBY: username,
@@ -232,11 +232,11 @@ app.post("/refer", async (req, res) => {
 
         async function processReferees(referees) {
           for (const ref of referees) {
-            const subscriber_hash = md5(ref.toLowerCase());
+            const subscriber_hash = md5(ref.toLowerCase().trim());
             console.log("ref =>", ref);
 
             await mailchimp.lists.setListMember(refListId, subscriber_hash, {
-              email_address: ref,
+              email_address: ref.trim(),
               status_if_new: "subscribed",
               merge_fields: {
                 REFERBY: username,
@@ -431,7 +431,7 @@ app.get("/refer", (req, res) => {
 
               let errorMsg = $('.error-msg');
 
-              let email = $('.email').val();
+              let email = $('.email').val().trim();
 
               let referees = email.split(',');
 
