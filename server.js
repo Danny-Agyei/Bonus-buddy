@@ -47,6 +47,26 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+//test
+app.get("/test", async (req, res) => {
+  const email = "dandesign96@gmail.com";
+
+  const subscriber_hash = md5(email.toLowerCase());
+
+  await mailchimp.lists.setListMember(refListId, subscriber_hash, {
+    email_address: email,
+    merge_fields: {
+      REFNAME: "Danny Test",
+    },
+  });
+
+  const response = await mailchimp.lists.getListMember(
+    refListId,
+    subscriber_hash
+  );
+  res.json({ data: response });
+});
+
 //Handle webhook request
 app.post("/", async (req, res, next) => {
   try {
@@ -147,25 +167,31 @@ app.post("/", async (req, res, next) => {
 });
 
 app.post("/refer", async (req, res) => {
-  const { referees, username } = req.body;
+  let { referees, refEmail, refName } = req.body;
 
-  if (username) {
+  console.log("REFNAME =>", refName);
+  console.log("REFEMAIL =>", refEmail);
+
+  refName = refName.replace("_", " ");
+
+  if (refEmail) {
     try {
-      const foundUser = await Hub.findOne({ email: username });
+      const foundUser = await Hub.findOne({ email: refEmail });
 
       //members to mailchimp
       const members = referees.map((ref) => ({
-        email_address: ref,
+        email_address: ref.trim(),
         status_if_new: "subscribed",
         merge_fields: {
-          REFERBY: username,
+          REFERBY: refEmail,
+          REFNAME: refName,
           COUNT: 0,
         },
       }));
 
       //members to db
       const dbMembers = referees.map((ref) => ({
-        email: ref,
+        email: ref.trim(),
         hasPurchase: false,
       }));
 
@@ -196,14 +222,15 @@ app.post("/refer", async (req, res) => {
 
         async function processReferees(referees) {
           for (const ref of referees) {
-            const subscriber_hash = md5(ref.toLowerCase());
+            const subscriber_hash = md5(ref.toLowerCase().trim());
             console.log("ref =>", ref);
 
             await mailchimp.lists.setListMember(refListId, subscriber_hash, {
-              email_address: ref,
+              email_address: ref.trim(),
               status_if_new: "subscribed",
               merge_fields: {
-                REFERBY: username,
+                REFERBY: refEmail,
+                REFNAME: refName,
                 COUNT: 1,
               },
             });
@@ -216,7 +243,7 @@ app.post("/refer", async (req, res) => {
         return res.json({ success: true, status: 200 });
       } else {
         const userHub = new Hub({
-          email: username,
+          email: refEmail,
           refCount: 0,
           referrals: dbMembers,
         });
@@ -232,14 +259,14 @@ app.post("/refer", async (req, res) => {
 
         async function processReferees(referees) {
           for (const ref of referees) {
-            const subscriber_hash = md5(ref.toLowerCase());
+            const subscriber_hash = md5(ref.toLowerCase().trim());
             console.log("ref =>", ref);
 
             await mailchimp.lists.setListMember(refListId, subscriber_hash, {
-              email_address: ref,
+              email_address: ref.trim(),
               status_if_new: "subscribed",
               merge_fields: {
-                REFERBY: username,
+                REFERBY: refEmail,
                 COUNT: 1,
               },
             });
@@ -416,14 +443,13 @@ app.get("/refer", (req, res) => {
   <script type="text/javascript">
       $(document).ready(function() {
 
-          function getQueryParameter(name) {
-              const urlParams = new URLSearchParams(window.location.search);
-              return urlParams.get(name);
-          };
+          const urlParams = new URLSearchParams(window.location.search);
 
-          const userEmail = getQueryParameter('user');
+          const refEmail = urlParams.get('user');
+          const refName = urlParams.get('name');
 
-          userEmail && localStorage.setItem('userEmail', userEmail);
+          refEmail && localStorage.setItem('refEmail', refEmail);
+          refName && localStorage.setItem('refName', refName);
 
 
           $('#form').submit(function(e) {
@@ -431,7 +457,7 @@ app.get("/refer", (req, res) => {
 
               let errorMsg = $('.error-msg');
 
-              let email = $('.email').val();
+              let email = $('.email').val().trim();
 
               let referees = email.split(',');
 
@@ -439,18 +465,20 @@ app.get("/refer", (req, res) => {
                   return !email.includes('@');
               })
 
-              const ref = localStorage.getItem('userEmail');
+              const refEmailFromStorage = localStorage.getItem('refEmail');
+              const refNameFromStorage = localStorage.getItem('refName');
 
               if (foundError.length > 0) {
                   errorMsg.show();
               } else {
-                  if (userEmail || ref) {
+                  if (refEmail || refEmailFromStorage) {
                        errorMsg.hide();
                       
                       $.ajax({
                           url: 'https://giant-pink-raincoat.cyclic.app/refer',
                           data: {
-                              "username": userEmail || ref,
+                              "refEmail": refEmail || refEmailFromStorage,
+                              "refName": refName || refNameFromStorage,
                               "referees": referees
                           },
                           type: "post",
@@ -494,8 +522,8 @@ app.get("*", (req, res) => {
 //SET DEFAULT PORT IF IN DEVELOPMENT MODE
 const PORT = process.env.PORT || 5000;
 
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on ${PORT} in ${process.env.NODE_ENV} mode`);
-  });
+// connectDB().then(() => {
+app.listen(PORT, () => {
+  console.log(`Server running on ${PORT} in ${process.env.NODE_ENV} mode`);
 });
+// });
