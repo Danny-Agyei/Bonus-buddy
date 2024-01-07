@@ -267,6 +267,7 @@ app.post("/refer", async (req, res) => {
               status_if_new: "subscribed",
               merge_fields: {
                 REFERBY: refEmail,
+		REFNAME: refName,
                 COUNT: 1,
               },
             });
