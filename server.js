@@ -47,26 +47,6 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//test
-app.get("/test", async (req, res) => {
-  const email = "dandesign96@gmail.com";
-
-  const subscriber_hash = md5(email.toLowerCase());
-
-  await mailchimp.lists.setListMember(refListId, subscriber_hash, {
-    email_address: email,
-    merge_fields: {
-      REFNAME: "Danny Test",
-    },
-  });
-
-  const response = await mailchimp.lists.getListMember(
-    refListId,
-    subscriber_hash
-  );
-  res.json({ data: response });
-});
-
 //Handle webhook request
 app.post("/", async (req, res, next) => {
   try {
@@ -168,9 +148,6 @@ app.post("/", async (req, res, next) => {
 
 app.post("/refer", async (req, res) => {
   let { referees, refEmail, refName } = req.body;
-
-  console.log("REFNAME =>", refName);
-  console.log("REFEMAIL =>", refEmail);
 
   refName = refName.replace("_", " ");
 
@@ -514,6 +491,7 @@ app.get("/refer", (req, res) => {
 });
 
 app.get("*", (req, res) => {
+console.log('PRODUCER =>',process.env.PRODUCER_EMAIL);
   res.json({
     status: 400,
     message: "Bad request",

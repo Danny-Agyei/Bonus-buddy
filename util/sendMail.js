@@ -350,7 +350,7 @@ export const sendEmail = async (referrer, invitee, eventClass, res) => {
   await transporter.sendMail(
     {
       from: '"Joe Cipriano" <info@merkadobarkada.com>', // sender address
-      to: "denise@promomasterclass.com,joe@promomasterclass.com,dandesign96@gmail.com", // list of receivers
+      to: process.env.PRODUCER_EMAIL, // list of receivers
       subject: "Exciting News! Referral Reward for Masterclass Enrollment",
       text: "", // plain text body
       html: eventClass.toLowerCase().includes("masterclass")
