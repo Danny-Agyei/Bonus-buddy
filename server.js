@@ -491,7 +491,6 @@ app.get("/refer", (req, res) => {
 });
 
 app.get("*", (req, res) => {
-console.log('PRODUCER =>',process.env.PRODUCER_EMAIL);
   res.json({
     status: 400,
     message: "Bad request",
