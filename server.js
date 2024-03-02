@@ -39,6 +39,9 @@ const connectDB = async () => {
   }
 };
 
+// Serve static files from the 'fonts' directory
+app.use('/fonts', express.static('fonts'));
+
 //MIDDLEWARES
 app.use(morgan("dev"));
 app.use(cors());
@@ -490,12 +493,12 @@ app.get("/refer", (req, res) => {
   res.send(htmlForm);
 });
 
-app.get("*", (req, res) => {
-  res.json({
-    status: 400,
-    message: "Bad request",
-  });
-});
+// app.get("*", (req, res) => {
+//   res.json({
+//     status: 400,
+//     message: "Bad request",
+//   });
+// });
 
 //SET DEFAULT PORT IF IN DEVELOPMENT MODE
 const PORT = process.env.PORT || 5000;
