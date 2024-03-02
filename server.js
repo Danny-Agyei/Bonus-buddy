@@ -6,7 +6,7 @@ import md5 from "md5";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from "cors";
-const path = require('path');
+import path from 'path';
 
 const app = express();
 
