@@ -40,7 +40,7 @@ const connectDB = async () => {
 };
 
 // Serve static files from the 'fonts' directory
-app.use('/fonts', express.static('fonts'));
+app.use('/fonts', express.static(path.join(__dirname, 'fonts')));
 
 //MIDDLEWARES
 app.use(morgan("dev"));
