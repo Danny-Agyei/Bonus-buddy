@@ -463,7 +463,7 @@ app.get("/refer", (req, res) => {
                        errorMsg.hide();
                       
                       $.ajax({
-                          url: 'https://giant-pink-raincoat.cyclic.app/refer',
+                          url: 'https://joe-promomasterclass.cyclic.app/refer',
                           data: {
                               "refEmail": refEmail || refEmailFromStorage,
                               "refName": refName || refNameFromStorage,
