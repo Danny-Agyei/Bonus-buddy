@@ -474,7 +474,7 @@ app.get("/refer", (req, res) => {
                        errorMsg.hide();
                       
                       $.ajax({
-                          url: 'https://bonus-buddy.onrender.com/refer',
+                          url: 'https://joe-promomasterclass.onrender.com/refer',
                           data: {
                               "refEmail": refEmail || refEmailFromStorage,
                               "refName": refName || refNameFromStorage,
