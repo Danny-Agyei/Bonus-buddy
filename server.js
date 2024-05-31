@@ -58,15 +58,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //TEST
-app.get('/lists', async(req,res) => {
+// app.get('/lists', async(req,res) => {
 
-const run = async () => {
-  const response = await mailchimp.lists.getAllLists();
-  console.log(response);
-};
+// const run = async () => {
+//   const response = await mailchimp.lists.getAllLists();
+//   console.log(response);
+// };
 
-run();
-});
+// run();
+// });
 
 //Handle webhook request
 app.post("/", async (req, res, next) => {
