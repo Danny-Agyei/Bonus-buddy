@@ -27,7 +27,7 @@ dotenv.config();
 const apiKey = process.env.MAILCHIMP_KEY;
 const listId = process.env.LIST_ID;
 const refListId = process.env.REFERRALS_LIST_ID;
-const serverPrefix = process.env.SERVER_PREFIX;
+const serverPrefix = "us21";
 
 //Configs
 mailchimp.setConfig({
@@ -463,7 +463,7 @@ app.get("/refer", (req, res) => {
                        errorMsg.hide();
                       
                       $.ajax({
-                          url: 'https://joe-promomasterclass.cyclic.app/refer',
+                          url: 'https://bonus-buddy.onrender.com/refer',
                           data: {
                               "refEmail": refEmail || refEmailFromStorage,
                               "refName": refName || refNameFromStorage,
