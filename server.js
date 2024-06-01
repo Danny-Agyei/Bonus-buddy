@@ -69,7 +69,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // });
 
 //Handle webhook request
-app.post("/", async (req, res, next) => {
+app.post("/webhook", async (req, res, next) => {
   try {
     let reqBody = await req.body;
 
