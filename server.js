@@ -480,7 +480,7 @@ app.get("/refer", (req, res) => {
                           data: {
                               "refEmail": refEmail || refEmailFromStorage,
                               "refName": refName || refNameFromStorage,
-                              "referees": email;
+                              "referees": email
                           },
                           type: "post",
                           dataType: "json",
