@@ -167,6 +167,8 @@ app.post("/webhook", async (req, res, next) => {
   }
 });
 
+
+//Handle form submition
 app.post("/refer", async (req, res) => {
   let { referees, refEmail, refName } = req.body;
 
@@ -478,7 +480,7 @@ app.get("/refer", (req, res) => {
                           data: {
                               "refEmail": refEmail || refEmailFromStorage,
                               "refName": refName || refNameFromStorage,
-                              "referees": referees
+                              "referees": email;
                           },
                           type: "post",
                           dataType: "json",
