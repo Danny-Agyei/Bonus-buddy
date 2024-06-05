@@ -474,7 +474,7 @@ app.get("/refer", (req, res) => {
                        errorMsg.hide();
                       
                       $.ajax({
-                          url: 'https://joe-promomasterclass.onrender.com/refer',
+                          url: 'https://hooks.zapier.com/hooks/catch/19042002/2ye7zbq/',
                           data: {
                               "refEmail": refEmail || refEmailFromStorage,
                               "refName": refName || refNameFromStorage,
